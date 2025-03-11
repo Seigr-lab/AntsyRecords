@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/desktop.css">
     <link rel="stylesheet" href="css/windows.css">
+    <link rel="stylesheet" href="css/catalog.css">
     <link rel="stylesheet" href="css/markdown.css">
     <link rel="stylesheet" href="css/tooltips.css">
     <link rel="stylesheet" href="css/ticker.css">
@@ -16,10 +17,21 @@
     <script defer src="js/main.js"></script>
     <script defer src="js/iconHandler.js"></script>
     <script defer src="js/windowManager.js"></script>
-    <script defer src="js/dragDrop.js"></script>
+    <script defer src="js/dragManager.js"></script>
+    <script defer src="js/iconManager.js"></script> <!-- Now modularized -->
     <script defer src="js/resizeHandler.js"></script>
     <script defer src="js/markdownLoader.js"></script>
+    <script defer src="js/catalogWindow.js"></script> 
     <script defer src="js/bandcampEmbed.js"></script>
+
+    <!-- ✅ Explicit Initialization to Ensure Scripts Load Correctly -->
+    <script defer>
+        document.addEventListener("DOMContentLoaded", () => {
+            console.log("✅ Ensuring Proper Initialization...");
+            initializeDragManager(); // Ensure icons are draggable
+            initializeIconManager(); // Ensure double-click actions work
+        });
+    </script>
 </head>
 <body>
     <div id="background-overlay"></div>
@@ -27,13 +39,16 @@
     <!-- Desktop Container (Ensures icons stay within window limits) -->
     <div id="desktop-container">
         <div id="desktop">
+            <!-- 🎵 Music Catalog Folder -->
+            <div class="icon" data-file="music-catalog">
+                <img src="icons/folder-music.png" alt="Music Catalog">
+                <span>Music Catalog</span>
+            </div>
+
+            <!-- ℹ️ About Icon -->
             <div class="icon" data-file="about">
                 <img src="icons/about.png" alt="About">
                 <span>About</span>
-            </div>
-            <div class="icon" data-file="music">
-                <img src="icons/audio.png" alt="Music">
-                <span>Seigr OS</span>
             </div>
         </div>
     </div>

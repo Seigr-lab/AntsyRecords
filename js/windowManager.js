@@ -1,74 +1,107 @@
 document.addEventListener("DOMContentLoaded", () => {
     console.log("✅ Window Manager Loaded");
 
-    function openWindow(file, title) {
+    function openWindow(file, title, albumId = null, albumTitle = null, artist = null) {
+        console.log(`📂 Opening window for: ${file}`);
+
         let existingWindow = document.getElementById(`${file}-window`);
         if (existingWindow) {
             bringWindowToFront(existingWindow);
-            return; // Prevent duplicate windows
+            return;
         }
 
+        switch (file) {
+            case "music-catalog":
+                openCatalogWindow();
+                return;
+            case "music-player":
+                if (albumId) {
+                    openPlayerWindow(albumId, albumTitle, artist);
+                } else {
+                    console.error("❌ No album ID provided for music player!");
+                }
+                return;
+            case "about":
+                openGenericWindow(file, title);
+                return;
+            default:
+                console.warn(`⚠️ No specific function for '${file}', using generic loader.`);
+                openGenericWindow(file, title);
+        }
+    }
+
+    function openGenericWindow(file, title) {
         let win = document.createElement("div");
-        win.classList.add("window");
         win.id = `${file}-window`;
+        win.classList.add("window");
+
         win.style.position = "absolute";
         win.style.left = `${Math.min(100 + Math.random() * 300, window.innerWidth - 320)}px`;
         win.style.top = `${Math.min(100 + Math.random() * 200, window.innerHeight - 250)}px`;
-        win.style.zIndex = "100"; // Make sure windows always stay on top
+        win.style.zIndex = "100";
 
         win.innerHTML = `
             <div class="window-header">
                 <span>${title}</span>
-                <button class="close-btn" data-file="${file}">✖</button>
+                <button class="close-btn">✖</button>
             </div>
-            <div class="window-content" id="${file}-content">Loading...</div>
+            <div class="window-content" id="${file}-content">
+                <p style="color: red;">Loading...</p>
+            </div>
         `;
 
         document.getElementById("window-container").appendChild(win);
-
         bringWindowToFront(win);
         makeDraggable(win);
         makeResizable(win);
 
-        let closeBtn = win.querySelector(".close-btn");
-        if (closeBtn) {
-            closeBtn.addEventListener("click", function(event) {
-                event.stopPropagation();
-                closeWindow(file);
+        win.querySelector(".close-btn").addEventListener("click", () => closeWindow(file));
+
+        fetch(`windows/${file}.html`)
+            .then(response => response.ok ? response.text() : Promise.reject())
+            .then(html => document.getElementById(`${file}-content`).innerHTML = html)
+            .catch(() => {
+                document.getElementById(`${file}-content`).innerHTML = `<p style="color:red;">Failed to load content.</p>`;
             });
+    }
+
+    function openPlayerWindow(albumId, title, artist) {
+        console.log(`🎵 Opening player window for: ${title} by ${artist}`);
+
+        let existingWindow = document.getElementById(`player-${albumId}-window`);
+        if (existingWindow) {
+            bringWindowToFront(existingWindow);
+            return;
         }
 
-        // ✅ Windows now block interaction with icons underneath
-        win.addEventListener("mousedown", function(event) {
-            event.stopPropagation();
-            bringWindowToFront(win);
-        });
+        let win = document.createElement("div");
+        win.id = `player-${albumId}-window`;
+        win.classList.add("window", "player-window");
 
-        win.addEventListener("mouseover", function(event) {
-            event.stopPropagation();
-        });
+        win.style.position = "absolute";
+        win.style.left = `${Math.min(100 + Math.random() * 300, window.innerWidth - 320)}px`;
+        win.style.top = `${Math.min(100 + Math.random() * 200, window.innerHeight - 250)}px`;
+        win.style.zIndex = "100";
 
-        // ✅ Load Content
-        if (file === "audio") {
-            embedBandcamp(win);
-        } else {
-            fetch(`./${file}.md`)
-                .then(response => {
-                    if (!response.ok) throw new Error(`Failed to load ${file}`);
-                    return response.text();
-                })
-                .then(text => {
-                    document.getElementById(`${file}-content`).innerHTML = `
-                        <div class="markdown-container">${marked.parse(text)}</div>
-                    `;
-                    fixMailtoLinks();
-                })
-                .catch(() => {
-                    document.getElementById(`${file}-content`).innerHTML = `
-                        <div class="error-message"><p style="color:red;">Failed to load content.</p></div>
-                    `;
-                });
-        }
+        win.innerHTML = `
+            <div class="window-header">
+                <span>Now Playing: ${title}</span>
+                <button class="close-btn">✖</button>
+            </div>
+            <div class="window-content">
+                <iframe style="width:100%; height:150px; border:none;"
+                    src="https://bandcamp.com/EmbeddedPlayer/album=${albumId}/size=large/bgcol=333333/linkcol=ffffff/minimal=true/transparent=true/"></iframe>
+            </div>
+        `;
+
+        document.getElementById("window-container").appendChild(win);
+        bringWindowToFront(win);
+        makeDraggable(win);
+        makeResizable(win);
+
+        win.querySelector(".close-btn").addEventListener("click", () => {
+            win.remove();
+        });
     }
 
     function closeWindow(file) {
@@ -80,7 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function bringWindowToFront(win) {
         document.querySelectorAll(".window").forEach(w => w.style.zIndex = "10");
-        win.style.zIndex = "200"; // Make sure active window is always at the front
+        win.style.zIndex = "200";
     }
 
     function makeDraggable(win) {
@@ -88,26 +121,31 @@ document.addEventListener("DOMContentLoaded", () => {
         let shiftX, shiftY;
         let isDragging = false;
 
-        function onMouseMove(event) {
-            if (!isDragging) return;
-            win.style.left = `${Math.max(0, Math.min(event.clientX - shiftX, window.innerWidth - win.offsetWidth))}px`;
-            win.style.top = `${Math.max(0, Math.min(event.clientY - shiftY, window.innerHeight - win.offsetHeight))}px`;
+        function onMove(event) {
+            let clientX = event.touches ? event.touches[0].clientX : event.clientX;
+            let clientY = event.touches ? event.touches[0].clientY : event.clientY;
+            win.style.left = `${Math.max(0, Math.min(clientX - shiftX, window.innerWidth - win.offsetWidth))}px`;
+            win.style.top = `${Math.max(0, Math.min(clientY - shiftY, window.innerHeight - win.offsetHeight))}px`;
         }
 
-        header.addEventListener("mousedown", function(event) {
+        function startDrag(event) {
             event.preventDefault();
             isDragging = true;
-            shiftX = event.clientX - win.getBoundingClientRect().left;
-            shiftY = event.clientY - win.getBoundingClientRect().top;
+            let clientX = event.touches ? event.touches[0].clientX : event.clientX;
+            let clientY = event.touches ? event.touches[0].clientY : event.clientY;
+            shiftX = clientX - win.getBoundingClientRect().left;
+            shiftY = clientY - win.getBoundingClientRect().top;
             bringWindowToFront(win);
 
-            document.addEventListener("mousemove", onMouseMove);
-            document.addEventListener("mouseup", function() {
+            document.addEventListener(event.type === "mousedown" ? "mousemove" : "touchmove", onMove);
+            document.addEventListener(event.type === "mousedown" ? "mouseup" : "touchend", () => {
                 isDragging = false;
-                document.removeEventListener("mousemove", onMouseMove);
+                document.removeEventListener(event.type === "mousedown" ? "mousemove" : "touchmove", onMove);
             }, { once: true });
-        });
+        }
 
+        header.addEventListener("mousedown", startDrag);
+        header.addEventListener("touchstart", startDrag, { passive: true });
         header.style.cursor = "grab";
     }
 
@@ -116,14 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
         win.style.overflow = "auto";
     }
 
-    function fixMailtoLinks() {
-        document.querySelectorAll('.markdown-container a[href^="mailto:"]').forEach(link => {
-            link.addEventListener("click", function(event) {
-                event.stopPropagation();
-            });
-        });
-    }
-
     window.openWindow = openWindow;
     window.closeWindow = closeWindow;
+    window.openPlayerWindow = openPlayerWindow;
 });

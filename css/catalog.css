@@ -1,0 +1,68 @@
+/* ✅ Make sure the catalog is a freeform space, not a structured grid */
+.music-catalog-container {
+    position: relative !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    padding: 10px;
+    overflow: hidden;
+}
+
+/* ✅ Ensure icons are absolute positioned, allowing free movement */
+.music-catalog-container .icon {
+    position: absolute !important;
+    width: 120px;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 🎵 Album Covers */
+.music-catalog-container .icon img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease-in-out;
+}
+
+.music-catalog-container .icon img:hover {
+    transform: scale(1.1);
+}
+
+/* 🎵 Album Titles */
+.music-catalog-container .icon span {
+    display: block;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+    margin-top: 5px;
+    max-width: 100px;
+    white-space: normal;
+    overflow: hidden;
+    text-align: center;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+/* ✅ Fix Scrollbar Issues */
+.music-catalog-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.music-catalog-container::-webkit-scrollbar-track {
+    background: #222;
+    border-radius: 5px;
+}
+
+.music-catalog-container::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 5px;
+}
+
+.music-catalog-container::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}
