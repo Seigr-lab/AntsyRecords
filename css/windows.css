@@ -1,4 +1,4 @@
-/* 🌟 Theme Variables for User Customization */
+/* 🌟 THEME VARIABLES - Only for Windows */
 :root {
     --window-bg: rgba(30, 30, 30, 0.95);
     --window-border: #333;
@@ -7,14 +7,12 @@
     --header-text: white;
     --close-btn-bg: red;
     --close-btn-hover: darkred;
-    --window-content-bg: black;
-    --window-content-text: white;
     --scrollbar-bg: #222;
     --scrollbar-thumb: #555;
     --scrollbar-thumb-hover: #777;
 }
 
-/* 🌟 Standard Window Styling */
+/* 🌟 BASE WINDOW STYLING */
 .window {
     position: absolute;
     min-width: 300px;
@@ -29,18 +27,18 @@
     flex-direction: column;
     resize: both;
     overflow: hidden;
-    z-index: 100; /* Windows always above icons */
-    pointer-events: auto; /* Ensures windows block interactions */
+    z-index: 100;
+    pointer-events: auto;
     transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
 }
 
-/* ✅ Dragging Effect */
+/* ✅ DRAGGING STATE */
 .window.dragging {
     opacity: 0.85;
     box-shadow: 4px 4px 18px rgba(255, 255, 255, 0.2);
 }
 
-/* ✅ Window Header */
+/* ✅ WINDOW HEADER */
 .window-header {
     background: var(--header-bg);
     padding: 8px 12px;
@@ -55,7 +53,7 @@
     border-top-right-radius: 8px;
 }
 
-/* 🚀 Close Button */
+/* 🚀 CLOSE BUTTON */
 .window-header button {
     background: var(--close-btn-bg);
     border: none;
@@ -71,22 +69,22 @@
     background: var(--close-btn-hover);
 }
 
-/* ✅ Standard Window Content */
+/* ✅ WINDOW CONTENT */
 .window-content {
     padding: 12px;
     overflow-y: auto;
     flex-grow: 1;
     font-size: 14px;
     line-height: 1.6;
-    background: var(--window-content-bg);
-    color: var(--window-content-text);
+    background: black; /* Moved from variable to avoid conflict with modular themes */
+    color: white;
     display: flex;
     flex-direction: column;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
 }
 
-/* ✅ Scrollbar Styling */
+/* ✅ SCROLLBAR (Specific to Windows) */
 .window-content::-webkit-scrollbar {
     width: 8px;
 }
@@ -105,16 +103,7 @@
     background: var(--scrollbar-thumb-hover);
 }
 
-/* ✅ 🎵 Specialized Catalog Window */
-.catalog-window .window-content {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-    gap: 12px;
-    padding: 10px;
-    overflow-y: auto;
-}
-
-/* 🏗️ Resizable Window Handles */
+/* ✅ RESIZABLE WINDOW HANDLES */
 .window::after {
     content: "";
     position: absolute;
@@ -127,15 +116,7 @@
     border-radius: 3px;
 }
 
-/* 🎭 Responsive Design */
-@media (max-width: 500px) {
-    .window {
-        width: 95%;
-        height: auto;
-    }
-}
-
-/* 🎨 Theme Overrides for User Settings */
+/* ✅ THEME OVERRIDES */
 [data-theme="light"] {
     --window-bg: rgba(245, 245, 245, 0.95);
     --window-border: #ddd;
@@ -144,8 +125,6 @@
     --header-text: black;
     --close-btn-bg: #e74c3c;
     --close-btn-hover: #c0392b;
-    --window-content-bg: white;
-    --window-content-text: black;
     --scrollbar-bg: #ddd;
     --scrollbar-thumb: #bbb;
     --scrollbar-thumb-hover: #999;
@@ -159,8 +138,6 @@
     --header-text: yellow;
     --close-btn-bg: yellow;
     --close-btn-hover: white;
-    --window-content-bg: black;
-    --window-content-text: yellow;
     --scrollbar-bg: black;
     --scrollbar-thumb: yellow;
     --scrollbar-thumb-hover: white;

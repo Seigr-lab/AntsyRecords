@@ -10,8 +10,8 @@
 <body>
     <div id="music-player-window" class="window">
         <div class="window-header">
-            <span id="player-title">Music Player</span>
-            <button class="close-btn" onclick="closePlayerWindow()">✖</button>
+            <span id="player-title">🎵 Music Player</span>
+            <button class="close-btn" aria-label="Close Music Player">✖</button>
         </div>
         
         <div class="window-content player-content">
@@ -32,11 +32,26 @@
 
             <!-- 📜 Tracklist -->
             <ul id="tracklist">
-                <li class="track-item" data-url="">No tracks loaded</li>
+                <li class="track-item no-tracks">No tracks loaded</li>
             </ul>
         </div>
     </div>
 
     <script src="../js/playerWindow.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // ✅ Hook Close Button Properly
+            const closeButton = document.querySelector(".close-btn");
+            if (closeButton) {
+                closeButton.addEventListener("click", () => {
+                    if (typeof window.closePlayerWindow === "function") {
+                        window.closePlayerWindow();
+                    } else {
+                        console.error("❌ closePlayerWindow() is not defined!");
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

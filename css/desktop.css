@@ -1,43 +1,46 @@
-/* 🌟 Theme Variables for Customizable Desktop */
+/* ✅ desktop.css - Styles for the Desktop Environment */
+
+/* 🎨 THEME VARIABLES */
 :root {
     --desktop-bg: url("../media/background.png");
-    --desktop-bg-color: #222; /* Fallback color if no image is used */
+    --desktop-bg-color: #222; /* Fallback if image fails */
     --desktop-icon-color: white;
     --desktop-icon-size: 80px;
+    --desktop-grid-spacing: 15px;
 }
 
-/* 🌄 Desktop Background */
+/* 🖥️ DESKTOP CONTAINER */
 #desktop-container {
     width: 100vw;
     height: 100vh;
     position: relative;
-    overflow: hidden; /* Prevents overflow issues */
+    overflow: hidden;
     background: var(--desktop-bg-color) var(--desktop-bg) center/cover no-repeat fixed;
     transition: background 0.5s ease-in-out;
 }
 
-/* 🖥️ Desktop Icons */
+/* 🏗️ FLEXIBLE DESKTOP LAYOUT */
 #desktop {
     position: absolute;
     width: 100%;
     height: 100%;
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-evenly;
-    align-items: center;
-    padding: 10px;
-    overflow: hidden; /* Ensures icons never exceed screen size */
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: var(--desktop-grid-spacing);
+    overflow: hidden;
 }
 
-/* 📌 Icon Styles */
+/* 🖼️ ICON STYLING */
 .icon {
     position: absolute;
     width: var(--desktop-icon-size);
     height: var(--desktop-icon-size);
-    cursor: pointer;
     text-align: center;
+    cursor: pointer;
     color: var(--desktop-icon-color);
-    z-index: 50; /* Ensures icons stay on top */
+    z-index: 50;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -45,13 +48,14 @@
     font-weight: bold;
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
     transition: transform 0.2s ease-in-out;
+    user-select: none; /* Prevents accidental text selection */
 }
 
 .icon:hover {
     transform: scale(1.1);
 }
 
-/* 🖼️ Icon Images */
+/* 🖼️ ICON IMAGES */
 .icon img {
     width: var(--desktop-icon-size);
     height: var(--desktop-icon-size);
@@ -59,9 +63,9 @@
     transition: transform 0.2s ease-in-out;
 }
 
-/* 🏗️ Scrollbar Customization */
+/* ✅ SCROLLBAR CUSTOMIZATION */
 #desktop-container::-webkit-scrollbar {
-    width: 10px;
+    width: 8px;
 }
 
 #desktop-container::-webkit-scrollbar-track {
@@ -78,7 +82,7 @@
     background: rgba(255, 255, 255, 0.5);
 }
 
-/* 🎨 Theme Overrides for User Settings */
+/* 🎨 THEME OVERRIDES */
 [data-theme="light"] {
     --desktop-bg-color: #f0f0f0;
     --desktop-icon-color: black;

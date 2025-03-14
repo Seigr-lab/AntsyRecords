@@ -2,8 +2,11 @@
 console.log("⚙️ Settings Manager Loaded");
 
 document.addEventListener("DOMContentLoaded", () => {
+    console.log("🚀 Initializing Settings...");
+
     // ✅ Ensure settings UI is available before executing
-    if (!document.getElementById("settings-content")) {
+    const settingsContainer = document.getElementById("settings-content");
+    if (!settingsContainer) {
         console.warn("⚠️ settings.js loaded on a page without settings UI. Skipping initialization.");
         return;
     }
@@ -12,6 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const backgroundType = document.getElementById("background-type");
     const backgroundColorPicker = document.getElementById("background-color-picker");
     const backgroundImageUpload = document.getElementById("background-image-upload");
+    const removeBackgroundButton = document.getElementById("remove-background");
     const fontSizeSelect = document.getElementById("font-size");
     const iconSizeInput = document.getElementById("icon-size");
     const saveButton = document.getElementById("save-settings");
@@ -21,6 +25,8 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("❌ Settings elements not found! Ensure settings.html is correctly structured.");
         return;
     }
+
+    let settingsChanged = false;
 
     // ✅ Load and Apply Settings on Page Load
     function applySettings() {
@@ -38,37 +44,36 @@ document.addEventListener("DOMContentLoaded", () => {
         if (savedBackgroundType === "color") {
             document.documentElement.style.setProperty("--desktop-bg-color", savedBackgroundColor);
             backgroundColorPicker.value = savedBackgroundColor;
+            removeBackgroundButton.style.display = "none";
         } else if (savedBackgroundType === "image" && savedBackgroundImage) {
             document.documentElement.style.setProperty("--desktop-bg", `url(${savedBackgroundImage})`);
+            removeBackgroundButton.style.display = "block";
+        } else {
+            removeBackgroundButton.style.display = "none";
         }
 
         fontSizeSelect.value = savedFontSize;
         document.documentElement.style.setProperty("font-size", savedFontSize === "default" ? "16px" : savedFontSize);
 
         iconSizeInput.value = savedIconSize;
-        updateIconSize(savedIconSize);
-    }
+        if (typeof window.updateIconSizes === "function") {
+            window.updateIconSizes(savedIconSize);
+        }
 
-    function updateIconSize(size) {
-        document.querySelectorAll(".icon").forEach(icon => {
-            icon.style.width = `${size}px`;
-            icon.style.height = `${size}px`;
-        });
+        settingsChanged = false;
     }
 
     // ✅ Event Listeners for Changes
-    themeSelect.addEventListener("change", () => {
-        document.documentElement.setAttribute("data-theme", themeSelect.value);
-    });
+    function trackChange() {
+        settingsChanged = true;
+    }
 
-    backgroundType.addEventListener("change", () => {
-        backgroundColorPicker.style.display = backgroundType.value === "color" ? "block" : "none";
-        backgroundImageUpload.style.display = backgroundType.value === "image" ? "block" : "none";
-    });
-
-    backgroundColorPicker.addEventListener("input", () => {
-        document.documentElement.style.setProperty("--desktop-bg-color", backgroundColorPicker.value);
-    });
+    themeSelect.addEventListener("change", trackChange);
+    backgroundType.addEventListener("change", trackChange);
+    backgroundColorPicker.addEventListener("input", trackChange);
+    backgroundImageUpload.addEventListener("change", trackChange);
+    fontSizeSelect.addEventListener("change", trackChange);
+    iconSizeInput.addEventListener("input", trackChange);
 
     backgroundImageUpload.addEventListener("change", (event) => {
         const file = event.target.files[0];
@@ -77,21 +82,26 @@ document.addEventListener("DOMContentLoaded", () => {
             reader.onload = (e) => {
                 document.documentElement.style.setProperty("--desktop-bg", `url(${e.target.result})`);
                 localStorage.setItem("backgroundImage", e.target.result);
+                removeBackgroundButton.style.display = "block";
             };
             reader.readAsDataURL(file);
         }
     });
 
-    fontSizeSelect.addEventListener("change", () => {
-        document.documentElement.style.setProperty("font-size", fontSizeSelect.value === "default" ? "16px" : fontSizeSelect.value);
-    });
-
-    iconSizeInput.addEventListener("input", () => {
-        updateIconSize(iconSizeInput.value);
+    removeBackgroundButton.addEventListener("click", () => {
+        document.documentElement.style.removeProperty("--desktop-bg");
+        localStorage.removeItem("backgroundImage");
+        removeBackgroundButton.style.display = "none";
+        settingsChanged = true;
     });
 
     // ✅ Save & Reset Buttons
     saveButton.addEventListener("click", () => {
+        if (!settingsChanged) {
+            alert("⚠️ No changes detected.");
+            return;
+        }
+
         localStorage.setItem("theme", themeSelect.value);
         localStorage.setItem("backgroundType", backgroundType.value);
         localStorage.setItem("backgroundColor", backgroundColorPicker.value);
@@ -99,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem("iconSize", iconSizeInput.value);
 
         alert("✅ Settings saved successfully!");
-        window.initializeIcons();
+        applySettings();
     });
 
     resetButton.addEventListener("click", () => {
@@ -111,3 +121,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // ✅ Apply saved settings on load
     applySettings();
 });
+
+// ✅ Expose Function to be Used in `settingsWindow.js`
+export function initializeSettingsLogic() {
+    console.log("⚙️ Applying Settings Logic...");
+    applySettings();
+}

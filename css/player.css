@@ -1,9 +1,9 @@
-/* 🎨 Theme Variables for User Customization */
+/* 🎨 THEME VARIABLES - PLAYER ONLY */
 :root {
     --player-bg: #111;
     --player-border: #444;
     --player-shadow: rgba(0, 0, 0, 0.5);
-    --player-text-color: white;
+    --player-text: white;
     --player-font: 'Courier New', monospace;
     --player-header-bg: #222;
     --close-btn-bg: #ff4444;
@@ -11,23 +11,26 @@
     --track-bg: #222;
     --track-hover: #444;
     --track-active: #666;
+    --player-scrollbar-bg: #222;
+    --player-scrollbar-thumb: #555;
+    --player-scrollbar-hover: #777;
 }
 
-/* 🎵 Player Window */
+/* 🎵 PLAYER WINDOW */
 .player-window {
     width: 420px;
     height: 320px;
     background: var(--player-bg);
     border: 2px solid var(--player-border);
     box-shadow: 4px 4px 8px var(--player-shadow);
-    color: var(--player-text-color);
+    color: var(--player-text);
     font-family: var(--player-font);
     position: absolute;
     overflow: hidden;
     border-radius: 8px;
 }
 
-/* 🎚️ Header (Title & Close Button) */
+/* 🎚️ HEADER (TITLE & CLOSE BUTTON) */
 .player-window .window-header {
     background: var(--player-header-bg);
     padding: 6px 12px;
@@ -54,7 +57,7 @@
     background: var(--close-btn-hover);
 }
 
-/* 🎵 Player Content */
+/* 🎵 PLAYER CONTENT */
 .player-content {
     padding: 12px;
     display: flex;
@@ -62,7 +65,7 @@
     align-items: center;
 }
 
-/* 🎶 Album Cover */
+/* 🎶 ALBUM COVER */
 .album-cover {
     width: 130px;
     height: 130px;
@@ -76,15 +79,15 @@
     transform: scale(1.05);
 }
 
-/* 🎼 Audio Player */
+/* 🎼 AUDIO PLAYER */
 #custom-audio-player {
     width: 100%;
     margin: 5px 0;
-    filter: invert(100%); /* Retro White Controls */
+    filter: invert(100%);
     border-radius: 5px;
 }
 
-/* 📜 Tracklist */
+/* 📜 TRACKLIST */
 #tracklist {
     list-style: none;
     padding: 0;
@@ -95,7 +98,7 @@
     border-top: 2px solid var(--player-border);
     padding-top: 5px;
     scrollbar-width: thin;
-    scrollbar-color: var(--track-hover) var(--player-bg);
+    scrollbar-color: var(--player-scrollbar-thumb) var(--player-scrollbar-bg);
 }
 
 .track-item {
@@ -118,26 +121,26 @@
     background: var(--track-active);
 }
 
-/* ✅ Scrollbar Customization */
+/* ✅ SCROLLBAR */
 #tracklist::-webkit-scrollbar {
     width: 6px;
 }
 
 #tracklist::-webkit-scrollbar-track {
-    background: var(--player-bg);
+    background: var(--player-scrollbar-bg);
     border-radius: 4px;
 }
 
 #tracklist::-webkit-scrollbar-thumb {
-    background: var(--track-hover);
+    background: var(--player-scrollbar-thumb);
     border-radius: 4px;
 }
 
 #tracklist::-webkit-scrollbar-thumb:hover {
-    background: var(--track-active);
+    background: var(--player-scrollbar-hover);
 }
 
-/* 🎭 Responsive Design */
+/* 🎭 RESPONSIVE DESIGN */
 @media (max-width: 500px) {
     .player-window {
         width: 90%;
@@ -145,10 +148,10 @@
     }
 }
 
-/* 🎨 Theme Overrides for User Settings */
+/* 🎨 THEME OVERRIDES */
 [data-theme="light"] {
     --player-bg: #f5f5f5;
-    --player-text-color: black;
+    --player-text: black;
     --player-border: #ddd;
     --player-shadow: rgba(0, 0, 0, 0.1);
     --player-header-bg: #ccc;
@@ -162,7 +165,7 @@
 
 [data-theme="high-contrast"] {
     --player-bg: black;
-    --player-text-color: yellow;
+    --player-text: yellow;
     --track-bg: black;
     --track-hover: yellow;
     --track-active: white;

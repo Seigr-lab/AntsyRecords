@@ -1,47 +1,82 @@
 // ✅ iconManager.js - Handles Icon Click Interactions
 console.log("✅ Icon Manager Loaded");
 
-document.addEventListener("DOMContentLoaded", () => {
+// ✅ Ensure Icon Manager is Properly Initialized
+function initializeIconManager() {
     console.log("🎨 Initializing Icon Manager...");
 
-    const icons = document.querySelectorAll(".icon");
+    document.addEventListener("dblclick", handleIconDoubleClick);
+}
 
-    icons.forEach(icon => {
-        let file = icon.getAttribute("data-file");
-        let url = icon.getAttribute("data-url");
+// ✅ Handle Icon Double Click Events
+function handleIconDoubleClick(event) {
+    let icon = event.target.closest(".icon");
+    if (!icon) return;
 
-        if (url) {
-            // ✅ External Links
-            console.log(`🌐 Setting up link for: ${url}`);
-            icon.addEventListener("dblclick", () => {
-                console.log(`🌍 Navigating to: ${url}`);
-                window.location.href = url;
-            });
-            return;
-        }
+    let file = icon.getAttribute("data-file");
+    let url = icon.getAttribute("data-url");
 
-        // ✅ Handle Window Opening Dynamically
-        icon.addEventListener("dblclick", () => {
-            console.log(`📂 Opening: ${file}`);
+    if (url) {
+        handleNavigation(url);
+        return;
+    }
 
-            if (!file) {
-                console.warn("⚠️ No valid file assigned to this icon.");
-                return;
-            }
+    if (!file) {
+        console.warn("⚠️ No valid file assigned to this icon.");
+        return;
+    }
 
-            switch (file) {
-                case "music-catalog":
-                    window.openCatalogWindow?.() || console.error("❌ openCatalogWindow() is not defined!");
-                    break;
-                case "settings":
-                    window.openSettingsWindow?.() || console.error("❌ openSettingsWindow() is not defined!");
-                    break;
-                case "about":
-                    window.openAboutWindow?.() || console.error("❌ openAboutWindow() is not defined!");
-                    break;
-                default:
-                    window.openGenericWindow?.(file, file) || console.error("❌ openGenericWindow() is not defined!");
-            }
-        });
-    });
-});
+    console.log(`📂 Opening: ${file}`);
+    openWindowByFile(file);
+}
+
+// ✅ Handle Internal vs External Navigation
+function handleNavigation(url) {
+    if (isExternalURL(url)) {
+        console.log(`🌍 Opening External Link: ${url}`);
+        window.open(url, "_blank", "noopener,noreferrer");
+    } else {
+        console.log(`🌍 Navigating to Internal URL: ${url}`);
+        window.location.href = url; // ✅ Internal links stay in the same window
+    }
+}
+
+// ✅ Detect If URL is External
+function isExternalURL(url) {
+    try {
+        let link = new URL(url, window.location.href);
+        return link.hostname !== window.location.hostname;
+    } catch (e) {
+        return false;
+    }
+}
+
+// ✅ Centralized Window Opening Logic
+function openWindowByFile(file) {
+    const windowFunctions = {
+        "music-catalog": "openCatalogWindow",
+        "settings": "openSettingsWindow",
+        "about": "openAboutWindow"
+    };
+
+    if (windowFunctions[file] && typeof window[windowFunctions[file]] === "function") {
+        window[windowFunctions[file]]();
+    } else if (typeof window.openGenericWindow === "function") {
+        window.openGenericWindow(file, file);
+    } else {
+        showError(`open${capitalizeFirstLetter(file)}Window()`);
+    }
+}
+
+// ✅ Capitalize Function for Error Logging
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+// ✅ Fallback Error Handler
+function showError(functionName) {
+    console.error(`❌ ${functionName} is not defined!`);
+}
+
+// ✅ Ensure Script Loads Properly
+document.addEventListener("DOMContentLoaded", initializeIconManager);

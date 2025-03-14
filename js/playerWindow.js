@@ -1,9 +1,15 @@
+// ✅ playerWindow.js - Manages the Music Player Window
+console.log("🎵 Custom Player Window Manager Loaded");
+
 import { fetchAlbumData } from "./bandcampAPI.js";
 
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("🎵 Custom Player Window Manager Loaded");
+    console.time("⏱️ Player Window Load Time");
 
     async function openPlayerWindow(albumId) {
+        console.log(`🎵 Opening Player Window for Album ID: ${albumId}`);
+
+        // ✅ Prevent multiple instances
         let existingWindow = document.getElementById("music-player-window");
         if (existingWindow) {
             bringWindowToFront(existingWindow);
@@ -16,20 +22,39 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        // ✅ Create player window
         let win = document.createElement("div");
         win.id = "music-player-window";
         win.classList.add("window", "player-window");
+        positionWindow(win);
 
-        let leftPos = Math.max(50, Math.min(100 + Math.random() * 300, window.innerWidth - 400));
-        let topPos = Math.max(50, Math.min(100 + Math.random() * 200, window.innerHeight - 300));
+        // ✅ Generate player UI
+        win.innerHTML = generatePlayerUI(albumData);
 
-        win.style.position = "absolute";
-        win.style.left = `${leftPos}px`;
-        win.style.top = `${topPos}px`;
-        win.style.zIndex = "100";
+        document.getElementById("window-container").appendChild(win);
+        bringWindowToFront(win);
+        makeDraggable(win);
+        makeResizable(win);
 
-        // ✅ Generate HTML for Custom Player
-        win.innerHTML = `
+        win.querySelector(".close-btn").addEventListener("click", closePlayerWindow);
+
+        if (albumData.tracks.length > 0) {
+            setupTrackSelection(win);
+        }
+
+        console.timeEnd("⏱️ Player Window Load Time");
+    }
+
+    function generatePlayerUI(albumData) {
+        const firstTrackUrl = albumData.tracks.length > 0 ? albumData.tracks[0].streamUrl : "";
+        const tracklistHtml = albumData.tracks.length > 0
+            ? albumData.tracks.map((track, index) => `
+                <li class="track-item" data-url="${track.streamUrl}">
+                    ${index + 1}. ${track.title}
+                </li>`).join("")
+            : `<li class="no-tracks">No playable tracks available</li>`;
+
+        return `
             <div class="window-header">
                 <span>${albumData.artist} - ${albumData.albumTitle}</span>
                 <button class="close-btn">✖</button>
@@ -37,29 +62,12 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="window-content player-content">
                 <img src="${albumData.coverUrl}" alt="Album Cover" class="album-cover">
                 <audio id="custom-audio-player" controls>
-                    <source id="audio-source" src="${albumData.tracks[0].streamUrl}" type="audio/mpeg">
+                    <source id="audio-source" src="${firstTrackUrl}" type="audio/mpeg">
                     Your browser does not support the audio element.
                 </audio>
-                <ul id="tracklist">
-                    ${albumData.tracks.map((track, index) => `
-                        <li class="track-item" data-url="${track.streamUrl}">
-                            ${index + 1}. ${track.title}
-                        </li>`).join("")}
-                </ul>
+                <ul id="tracklist">${tracklistHtml}</ul>
             </div>
         `;
-
-        document.getElementById("window-container").appendChild(win);
-
-        bringWindowToFront(win);
-        makeDraggable(win);
-        makeResizable(win);
-
-        win.querySelector(".close-btn").addEventListener("click", () => {
-            closePlayerWindow();
-        });
-
-        setupTrackSelection(win);
     }
 
     function setupTrackSelection(win) {
@@ -70,9 +78,13 @@ document.addEventListener("DOMContentLoaded", () => {
         tracklist.forEach(track => {
             track.addEventListener("click", function () {
                 let trackUrl = this.getAttribute("data-url");
-                audioSource.src = trackUrl;
-                audioPlayer.load();
-                audioPlayer.play();
+                if (audioSource.src === trackUrl && !audioPlayer.paused) {
+                    audioPlayer.pause();
+                } else {
+                    audioSource.src = trackUrl;
+                    audioPlayer.load();
+                    audioPlayer.play();
+                }
             });
         });
     }
@@ -87,6 +99,18 @@ document.addEventListener("DOMContentLoaded", () => {
         win.style.zIndex = "200";
     }
 
+    function positionWindow(win) {
+        let leftPos = Math.max(50, Math.min(100 + Math.random() * 300, window.innerWidth - 400));
+        let topPos = Math.max(50, Math.min(100 + Math.random() * 200, window.innerHeight - 300));
+
+        win.style.position = "absolute";
+        win.style.left = `${leftPos}px`;
+        win.style.top = `${topPos}px`;
+        win.style.zIndex = "100";
+        win.style.minWidth = "320px";
+        win.style.minHeight = "250px";
+    }
+
     function makeDraggable(win) {
         let header = win.querySelector(".window-header");
         let shiftX, shiftY;
@@ -95,8 +119,11 @@ document.addEventListener("DOMContentLoaded", () => {
         function moveWindow(clientX, clientY) {
             let newLeft = Math.max(0, Math.min(clientX - shiftX, window.innerWidth - win.offsetWidth));
             let newTop = Math.max(0, Math.min(clientY - shiftY, window.innerHeight - win.offsetHeight));
-            win.style.left = `${newLeft}px`;
-            win.style.top = `${newTop}px`;
+
+            requestAnimationFrame(() => {
+                win.style.left = `${newLeft}px`;
+                win.style.top = `${newTop}px`;
+            });
         }
 
         function startDrag(event) {
@@ -137,6 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
         win.style.overflow = "auto";
     }
 
+    // ✅ Ensure global accessibility
     window.openPlayerWindow = openPlayerWindow;
     window.closePlayerWindow = closePlayerWindow;
 });

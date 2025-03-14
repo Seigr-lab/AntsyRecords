@@ -4,8 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Antsy Records</title>
+
+    <!-- ✅ Essential Meta Only -->
+    <meta name="description" content="Explore Antsy Records' diverse music catalog with a fully interactive experience.">
+    <meta name="keywords" content="Antsy Records, music, Bandcamp, albums, artists">
     
-    <!-- Stylesheets -->
+    <!-- ✅ Favicon -->
+    <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
+
+    <!-- ✅ Stylesheets -->
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/desktop.css">
     <link rel="stylesheet" href="css/windows.css">
@@ -13,21 +20,21 @@
     <link rel="stylesheet" href="css/markdown.css">
     <link rel="stylesheet" href="css/tooltips.css">
     <link rel="stylesheet" href="css/ticker.css">
-    <link rel="stylesheet" href="css/media.css"> <!-- Responsive support -->
-    <link rel="stylesheet" href="css/player.css"> <!-- Music Player UI -->
-    <link rel="stylesheet" href="css/settings.css"> <!-- Settings UI -->
+    <link rel="stylesheet" href="css/media.css">
+    <link rel="stylesheet" href="css/player.css">
+    <link rel="stylesheet" href="css/settings.css">
 
-    <!-- Markdown Support -->
+    <!-- ✅ Markdown Support -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-    <!-- Core Managers -->
+    <!-- ✅ Core Managers -->
     <script defer src="js/dragManager.js"></script>
     <script defer src="js/windowManager.js"></script>
-    <script defer src="js/iconManager.js"></script> <!-- Must load before iconHandler -->
+    <script defer src="js/iconManager.js"></script>
     <script defer src="js/iconHandler.js"></script>
     <script defer src="js/resizeHandler.js"></script>
 
-    <!-- Window and Content Loaders -->
+    <!-- ✅ Window and Content Loaders -->
     <script type="module">
         import "./js/catalogWindow.js";
         import "./js/playerWindow.js";
@@ -35,31 +42,29 @@
         import "./js/settings.js";
     </script>    
 
-    <!-- ✅ Ensure Proper Initialization -->
+    <!-- ✅ Ensuring Proper Initialization -->
     <script defer>
         document.addEventListener("DOMContentLoaded", async () => {
             console.log("✅ Ensuring Proper Initialization...");
 
-            // Ensure all core functions exist before calling them
             if (typeof initializeDragManager === "function") {
-                initializeDragManager(); // Ensure icons are draggable
+                initializeDragManager();
             } else {
                 console.error("❌ initializeDragManager() is not defined!");
             }
 
             if (typeof initializeIcons === "function") {
-                initializeIcons(); // Ensure correct icon positioning
+                initializeIcons();
             } else {
                 console.error("❌ initializeIcons() is not defined!");
             }
 
             if (typeof updateIconSizes === "function") {
-                updateIconSizes(); // Apply user settings
+                updateIconSizes();
             } else {
                 console.error("❌ updateIconSizes() is not defined!");
             }
 
-            // Ensure module-based functions load dynamically
             try {
                 const { initializeWindows } = await import("./js/windowManager.js");
                 initializeWindows();
@@ -68,46 +73,46 @@
             }
         });
     </script>
-
 </head>
 <body>
+    <!-- ✅ Background Overlay -->
     <div id="background-overlay"></div>
 
-    <!-- Desktop Container (Ensures icons stay within window limits) -->
-    <div id="desktop-container">
+    <!-- ✅ Desktop Container -->
+    <div id="desktop-container" role="main">
         <div id="desktop">
-            <!-- 🎵 Music Catalog Folder -->
+            <!-- 🎵 Music Catalog -->
             <div class="icon" data-file="music-catalog">
                 <img src="icons/folder-music.png" alt="Music Catalog">
                 <span>Music Catalog</span>
             </div>
 
-            <!-- ℹ️ About Icon -->
+            <!-- ℹ️ About -->
             <div class="icon" data-file="about">
                 <img src="icons/about.png" alt="About">
                 <span>About</span>
             </div>
 
-            <!-- ⚙️ Settings Icon -->
+            <!-- ⚙️ Settings -->
             <div class="icon" data-file="settings">
                 <img src="icons/settings.png" alt="Settings">
                 <span>Settings</span>
             </div>
 
-            <!-- 🌐 Seamless Navigation Between Seigr Subdomains -->
-            <div class="icon shortcut" data-url="http://sonisk.seigr.net">
+            <!-- 🌐 Seamless Navigation -->
+            <div class="icon shortcut" data-url="http://sonisk.seigr.net" onclick="window.open(this.dataset.url, '_blank')">
                 <img src="icons/audio.png" alt="Sonisk">
                 <span>Sonisk Seigr</span>
             </div>
 
-            <div class="icon shortcut" data-url="http://seigr.net">
+            <div class="icon shortcut" data-url="http://seigr.net" onclick="window.open(this.dataset.url, '_blank')">
                 <img src="icons/seigr.png" alt="Seigr">
                 <span>Seigr</span>
             </div>
         </div>
     </div>
 
-    <!-- Window Container -->
+    <!-- ✅ Window Container -->
     <div id="window-container"></div>
 
     <!-- ✅ Scrolling Ticker -->

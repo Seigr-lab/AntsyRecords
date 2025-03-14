@@ -1,4 +1,6 @@
-/* ✅ Reset Defaults */
+/* ✅ base.css - Global Styling & Reset */
+
+/* ✅ Universal Reset */
 * {
     margin: 0;
     padding: 0;
@@ -6,20 +8,17 @@
     user-select: none;
 }
 
-/* ✅ Set Background */
-body, html {
-    background-color: #FF0000; /* Fallback */
-    background-image: url('/media/background.png');
-    background-size: cover; /* ✅ Ensure full coverage */
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    color: #ffffff;
+/* ✅ Ensure Consistent Full-Screen Background */
+html, body {
+    width: 100vw;
+    height: 100vh;
     font-family: Arial, sans-serif;
+    color: white;
     overflow: hidden;
+    background: var(--bg-color, #222) var(--bg-image, url("/media/background.png")) center/cover no-repeat fixed;
 }
 
-/* ✅ Apply a Semi-Transparent Overlay */
+/* ✅ Apply a Semi-Transparent Overlay for Depth */
 body::before {
     content: "";
     position: fixed;
@@ -27,15 +26,16 @@ body::before {
     left: 0;
     width: 100vw;
     height: 100vh;
+    background: rgba(0, 0, 0, 0.4); /* ✅ Adjustable Overlay */
     pointer-events: none;
     z-index: 0;
 }
 
-/* ✅ Desktop Container */
+/* ✅ Desktop Container (Holds Icons & Windows) */
 #desktop-container {
     width: 100vw;
     height: 100vh;
     position: relative;
     overflow: hidden;
-    background: transparent; /* ✅ Ensure nothing blocks the GIF */
+    background: transparent; /* ✅ Ensure nothing blocks the background */
 }

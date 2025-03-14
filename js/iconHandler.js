@@ -14,31 +14,17 @@ function initializeIcons() {
 
     const containerWidth = desktopContainer.clientWidth;
     const containerHeight = desktopContainer.clientHeight;
-    const usedPositions = [];
 
     // ✅ Get user-defined icon size (Default: 80px)
     let iconSize = parseInt(localStorage.getItem("iconSize") || 80, 10);
     const padding = 20; // Minimum spacing between icons
+    const columns = Math.max(1, Math.floor(containerWidth / (iconSize + padding)));
+    let x = 0, y = 0;
 
-    // ✅ Dynamically Position Icons Without Overlap
-    icons.forEach(icon => {
-        let left, top, attempts = 0, maxAttempts = 50;
-        let positionFound = false;
-
-        while (!positionFound && attempts < maxAttempts) {
-            left = Math.floor(Math.random() * (containerWidth - iconSize - padding));
-            top = Math.floor(Math.random() * (containerHeight - iconSize - padding));
-
-            if (!isOverlapping(left, top)) {
-                positionFound = true;
-                usedPositions.push({ left, top });
-            }
-            attempts++;
-        }
-
-        // ✅ Apply Position & Size
-        icon.style.left = `${left}px`;
-        icon.style.top = `${top}px`;
+    // ✅ Position Icons in a Grid Layout
+    icons.forEach((icon, index) => {
+        icon.style.left = `${x}px`;
+        icon.style.top = `${y}px`;
         icon.style.width = `${iconSize}px`;
         icon.style.height = `${iconSize}px`;
 
@@ -48,23 +34,30 @@ function initializeIcons() {
             img.style.height = `${iconSize}px`;
         }
 
-        console.log(`📌 Positioned: ${icon.innerText.trim()} at (${left}px, ${top}px)`);
-    });
+        console.log(`📌 Positioned: ${icon.innerText.trim()} at (${x}px, ${y}px)`);
 
-    function isOverlapping(left, top) {
-        return usedPositions.some(pos =>
-            Math.abs(pos.left - left) < iconSize + padding &&
-            Math.abs(pos.top - top) < iconSize + padding
-        );
-    }
+        // ✅ Move to the next grid position
+        if ((index + 1) % columns === 0) {
+            x = 0;
+            y += iconSize + padding;
+        } else {
+            x += iconSize + padding;
+        }
+
+        // ✅ Ensure icons never overflow the container
+        if (y + iconSize > containerHeight) {
+            console.warn(`⚠️ Not enough space for all icons! Some may be hidden.`);
+        }
+    });
 }
 
-// ✅ Allow Dynamic Icon Resizing
+// ✅ Smooth Dynamic Icon Resizing
 function updateIconSizes() {
     console.log("🔄 Updating Icon Sizes...");
     let newSize = parseInt(localStorage.getItem("iconSize") || 80, 10);
 
     document.querySelectorAll(".icon").forEach(icon => {
+        icon.style.transition = "width 0.2s ease, height 0.2s ease";
         icon.style.width = `${newSize}px`;
         icon.style.height = `${newSize}px`;
 
@@ -74,6 +67,9 @@ function updateIconSizes() {
             img.style.height = `${newSize}px`;
         }
     });
+
+    // ✅ Recalculate Icon Positions After Resize
+    setTimeout(initializeIcons, 250);
 }
 
 // ✅ Expose functions globally

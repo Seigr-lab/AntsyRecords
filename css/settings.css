@@ -1,45 +1,67 @@
 /* ✅ settings.css - Styles for the Settings Window */
 
 :root {
-    --bg-color: #222; /* Default dark mode background */
-    --text-color: #fff; /* Default text color */
+    --settings-bg: #222;
+    --settings-text: #fff;
+    --settings-border: #555;
+    --settings-shadow: rgba(0, 0, 0, 0.5);
     --input-bg: #333;
     --input-border: #555;
     --button-bg: #444;
     --button-hover: #666;
+    --button-text: white;
+    --header-font: "Arial", sans-serif;
 }
 
 /* 🎨 Light Mode Theme */
 [data-theme="light"] {
-    --bg-color: #f9f9f9;
-    --text-color: #111;
+    --settings-bg: #f9f9f9;
+    --settings-text: #111;
+    --settings-border: #ccc;
+    --settings-shadow: rgba(0, 0, 0, 0.1);
     --input-bg: #fff;
     --input-border: #ccc;
     --button-bg: #ddd;
     --button-hover: #bbb;
+    --button-text: black;
 }
 
-/* ✅ General Styles */
+/* 🎨 High Contrast Mode */
+[data-theme="high-contrast"] {
+    --settings-bg: black;
+    --settings-text: yellow;
+    --settings-border: yellow;
+    --settings-shadow: rgba(255, 255, 0, 0.4);
+    --input-bg: black;
+    --input-border: yellow;
+    --button-bg: yellow;
+    --button-hover: white;
+    --button-text: black;
+}
+
+/* ✅ SETTINGS WINDOW */
 #settings-window {
-    font-family: Arial, sans-serif;
-    background: var(--bg-color);
-    color: var(--text-color);
+    font-family: var(--header-font);
+    background: var(--settings-bg);
+    color: var(--settings-text);
     width: 500px;
     height: auto;
-    border: 1px solid var(--input-border);
+    border: 2px solid var(--settings-border);
     border-radius: 8px;
     padding: 20px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 10px var(--settings-shadow);
+    display: flex;
+    flex-direction: column;
 }
 
-/* ✅ Settings Header */
+/* ✅ SETTINGS HEADER */
 #settings-window h2 {
     font-size: 22px;
     margin-bottom: 15px;
     text-align: center;
 }
 
-/* ✅ Input Fields */
+/* ✅ FORM INPUTS & LABELS */
 #settings-window label {
     font-weight: bold;
     display: block;
@@ -55,28 +77,30 @@
     margin-top: 5px;
     border: 1px solid var(--input-border);
     background: var(--input-bg);
-    color: var(--text-color);
+    color: var(--settings-text);
     border-radius: 4px;
+    transition: border 0.2s ease-in-out;
 }
 
-/* ✅ Buttons */
+/* ✅ BUTTONS */
 #settings-window button {
     width: 100%;
     padding: 10px;
     margin-top: 15px;
     background: var(--button-bg);
     border: none;
-    color: var(--text-color);
+    color: var(--button-text);
     font-weight: bold;
     cursor: pointer;
     border-radius: 4px;
+    transition: background 0.2s ease-in-out;
 }
 
 #settings-window button:hover {
     background: var(--button-hover);
 }
 
-/* ✅ Responsive Styles */
+/* ✅ RESPONSIVE DESIGN */
 @media (max-width: 600px) {
     #settings-window {
         width: 90%;
