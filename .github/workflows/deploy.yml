@@ -17,5 +17,18 @@ jobs:
           echo "export const BANDCAMP_CLIENT_ID = '${{ secrets.BANDCAMP_CLIENT_ID }}';" > credentials.js
           echo "export const BANDCAMP_CLIENT_SECRET = '${{ secrets.BANDCAMP_CLIENT_SECRET }}';" >> credentials.js
 
+      - name: Build Site
+        run: |
+          # Add your build commands here
+          echo "Building site..."
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: site-artifact
+          path: path/to/build/output
+
       - name: Deploy to GitHub Pages
         uses: actions/upload-pages-artifact@v1
+        with:
+          path: path/to/build/output
