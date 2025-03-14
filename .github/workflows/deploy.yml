@@ -23,7 +23,7 @@ jobs:
           echo "Building site..."
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3 # Use the latest version
         with:
           name: site-artifact
           path: path/to/build/output
