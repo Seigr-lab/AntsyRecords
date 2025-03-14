@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Antsy Records</title>
 
-    <!-- ✅ Essential Meta Only -->
+    <!-- ✅ Essential Meta -->
     <meta name="description" content="Explore Antsy Records' diverse music catalog with a fully interactive experience.">
     <meta name="keywords" content="Antsy Records, music, Bandcamp, albums, artists">
     
@@ -27,12 +27,12 @@
     <!-- ✅ Markdown Support -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-    <!-- ✅ Core Managers -->
-    <script defer src="js/dragManager.js"></script>
-    <script defer src="js/windowManager.js"></script>
-    <script defer src="js/iconManager.js"></script>
-    <script defer src="js/iconHandler.js"></script>
-    <script defer src="js/resizeHandler.js"></script>
+    <!-- ✅ Core Managers (Modules) -->
+    <script type="module" src="js/dragManager.js"></script>
+    <script type="module" src="js/windowManager.js"></script>
+    <script type="module" src="js/iconManager.js"></script>
+    <script type="module" src="js/iconHandler.js"></script>
+    <script type="module" src="js/resizeHandler.js"></script>
 
     <!-- ✅ Window and Content Loaders -->
     <script type="module">
@@ -43,34 +43,16 @@
     </script>    
 
     <!-- ✅ Ensuring Proper Initialization -->
-    <script defer>
+    <script type="module">
+        import { initializeDragManager } from "./js/dragManager.js";
+        import { initializeIcons } from "./js/iconHandler.js";
+        import { initializeWindows } from "./js/windowManager.js";
+
         document.addEventListener("DOMContentLoaded", async () => {
             console.log("✅ Ensuring Proper Initialization...");
-
-            if (typeof initializeDragManager === "function") {
-                initializeDragManager();
-            } else {
-                console.error("❌ initializeDragManager() is not defined!");
-            }
-
-            if (typeof initializeIcons === "function") {
-                initializeIcons();
-            } else {
-                console.error("❌ initializeIcons() is not defined!");
-            }
-
-            if (typeof updateIconSizes === "function") {
-                updateIconSizes();
-            } else {
-                console.error("❌ updateIconSizes() is not defined!");
-            }
-
-            try {
-                const { initializeWindows } = await import("./js/windowManager.js");
-                initializeWindows();
-            } catch (err) {
-                console.error("❌ Failed to load windowManager module:", err);
-            }
+            initializeDragManager();
+            initializeIcons();
+            initializeWindows();
         });
     </script>
 </head>
@@ -99,13 +81,13 @@
                 <span>Settings</span>
             </div>
 
-            <!-- 🌐 Seamless Navigation -->
-            <div class="icon shortcut" data-url="http://sonisk.seigr.net" onclick="window.open(this.dataset.url, '_blank')">
+            <!-- 🌐 Other Seigr "Desktops" Links -->
+            <div class="icon shortcut" data-url="http://sonisk.seigr.net">
                 <img src="icons/audio.png" alt="Sonisk">
                 <span>Sonisk Seigr</span>
             </div>
 
-            <div class="icon shortcut" data-url="http://seigr.net" onclick="window.open(this.dataset.url, '_blank')">
+            <div class="icon shortcut" data-url="http://seigr.net">
                 <img src="icons/seigr.png" alt="Seigr">
                 <span>Seigr</span>
             </div>

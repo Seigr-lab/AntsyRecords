@@ -1,68 +1,18 @@
 // ✅ bandcampAPI.js - Handles Bandcamp API requests for Antsy Records
 console.log("🎵 Bandcamp API Manager Loaded");
 
-// ✅ Import API credentials securely (local for dev, GitHub Secrets in production)
-import { getClientId, getClientSecret } from "./credentials.js"; 
+// ✅ Use Correct Developer API Endpoint
+const BANDCAMP_API_BASE = "https://bandcamp.com/api/developer/1.0/";
+const LABEL_ID = "antsyrecords"; 
 
-const BANDCAMP_AUTH_URL = "https://bandcamp.com/oauth_token";
-const BANDCAMP_API_BASE = "https://bandcamp.com/api/";
-const LABEL_ID = "antsyrecords"; // ✅ Set your Bandcamp label ID
-
-// ✅ Obtain Access Token from Bandcamp API
-async function getAccessToken() {
-    console.log("🔑 Requesting Bandcamp Access Token...");
-
-    const clientId = getClientId();
-    const clientSecret = getClientSecret();
-
-    if (!clientId || !clientSecret) {
-        console.error("❌ Missing Bandcamp API credentials!");
-        return null;
-    }
-
-    try {
-        const params = new URLSearchParams();
-        params.append("grant_type", "client_credentials");
-        params.append("client_id", clientId);
-        params.append("client_secret", clientSecret);
-
-        const response = await fetch(BANDCAMP_AUTH_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: params.toString(),
-        });
-
-        if (!response.ok) {
-            throw new Error(`❌ Failed to obtain access token: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        if (!data.access_token) {
-            throw new Error("❌ Invalid OAuth response - No access token received.");
-        }
-
-        console.log("✅ Bandcamp Access Token Obtained");
-        return data.access_token;
-    } catch (error) {
-        console.error("❌ Error retrieving Bandcamp access token:", error);
-        return null;
-    }
-}
-
-// ✅ Fetch Bandcamp releases for Antsy Records
+// ✅ Fetch Bandcamp releases (Full catalog)
 export async function fetchBandcampReleases() {
     console.log("📡 Fetching Bandcamp releases...");
-
-    const accessToken = await getAccessToken();
-    if (!accessToken) return [];
 
     try {
         const response = await fetch(`${BANDCAMP_API_BASE}label/${LABEL_ID}/albums`, {
             method: "GET",
-            headers: {
-                "Accept": "application/json",
-                "Authorization": `Bearer ${accessToken}`
-            },
+            headers: { "Accept": "application/json" },
         });
 
         if (!response.ok) {
@@ -70,7 +20,6 @@ export async function fetchBandcampReleases() {
         }
 
         const data = await response.json();
-
         if (!data || !Array.isArray(data.albums)) {
             throw new Error("❌ Invalid API response structure.");
         }
@@ -90,20 +39,19 @@ export async function fetchBandcampReleases() {
     }
 }
 
-// ✅ Fetch album data (tracks, stream links, etc.)
+// ✅ Fetch a single album's data (Fix for `playerWindow.js`)
 export async function fetchAlbumData(albumId) {
-    console.log(`🎵 Fetching album data for ID: ${albumId}`);
+    if (!albumId) {
+        console.error("❌ Album ID is required!");
+        return null;
+    }
 
-    const accessToken = await getAccessToken();
-    if (!accessToken) return null;
+    console.log(`📡 Fetching details for album ID: ${albumId}`);
 
     try {
         const response = await fetch(`${BANDCAMP_API_BASE}album/${albumId}`, {
             method: "GET",
-            headers: {
-                "Accept": "application/json",
-                "Authorization": `Bearer ${accessToken}`
-            },
+            headers: { "Accept": "application/json" },
         });
 
         if (!response.ok) {
@@ -111,27 +59,22 @@ export async function fetchAlbumData(albumId) {
         }
 
         const data = await response.json();
-        console.log("✅ Album Data:", data);
-
-        if (!data.tracks || !Array.isArray(data.tracks)) {
-            throw new Error("❌ Invalid album track data.");
+        if (!data || !data.title || !data.artist) {
+            throw new Error("❌ Invalid API response for album data.");
         }
 
+        console.log(`✅ Album fetched: ${data.title} by ${data.artist}`);
+
         return {
-            albumTitle: data.title,
+            albumId: albumId,
+            title: data.title,
             artist: data.artist,
-            coverUrl: data.art_url || "icons/default-cover.png",
-            tracks: data.tracks.map(track => ({
-                title: track.title,
-                streamUrl: track.streaming_url || "",
-            })),
+            cover: data.thumb_url || "icons/default-cover.png",
+            tracks: data.tracks || [],
         };
 
     } catch (error) {
-        console.error("❌ Error fetching album data:", error);
+        console.error(`❌ Error fetching album data for ${albumId}:`, error);
         return null;
     }
 }
-
-// ✅ Ensure functions are properly exported for external use
-export { getAccessToken, fetchBandcampReleases, fetchAlbumData };

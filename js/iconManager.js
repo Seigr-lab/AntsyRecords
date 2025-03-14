@@ -1,25 +1,29 @@
-// ✅ iconManager.js - Handles Icon Click Interactions
+// ✅ iconManager.js - Handles Icon Double Click & Touch Interaction
 console.log("✅ Icon Manager Loaded");
 
+// ✅ Import functions from windowManager.js (🔥 FIXED: Now properly references existing functions)
+import { openCatalogWindow, openAboutWindow, openSettingsWindow } from "./windowManager.js";
+
 // ✅ Ensure Icon Manager is Properly Initialized
-function initializeIconManager() {
+export function initializeIconManager() {
     console.log("🎨 Initializing Icon Manager...");
 
     document.addEventListener("dblclick", handleIconDoubleClick);
+    document.addEventListener("touchstart", handleTouchStart, { passive: true });
+
+    document.querySelectorAll(".icon").forEach(icon => {
+        icon.onclick = null;
+    });
 }
 
-// ✅ Handle Icon Double Click Events
+// ✅ Handle Icon Double Click Events (Desktop)
 function handleIconDoubleClick(event) {
     let icon = event.target.closest(".icon");
-    if (!icon) return;
+    if (!icon) return; 
+
+    console.log(`🖱️ Double-click detected on: ${icon.innerText.trim()}`);
 
     let file = icon.getAttribute("data-file");
-    let url = icon.getAttribute("data-url");
-
-    if (url) {
-        handleNavigation(url);
-        return;
-    }
 
     if (!file) {
         console.warn("⚠️ No valid file assigned to this icon.");
@@ -27,55 +31,36 @@ function handleIconDoubleClick(event) {
     }
 
     console.log(`📂 Opening: ${file}`);
-    openWindowByFile(file);
-}
 
-// ✅ Handle Internal vs External Navigation
-function handleNavigation(url) {
-    if (isExternalURL(url)) {
-        console.log(`🌍 Opening External Link: ${url}`);
-        window.open(url, "_blank", "noopener,noreferrer");
-    } else {
-        console.log(`🌍 Navigating to Internal URL: ${url}`);
-        window.location.href = url; // ✅ Internal links stay in the same window
-    }
-}
-
-// ✅ Detect If URL is External
-function isExternalURL(url) {
-    try {
-        let link = new URL(url, window.location.href);
-        return link.hostname !== window.location.hostname;
-    } catch (e) {
-        return false;
-    }
-}
-
-// ✅ Centralized Window Opening Logic
-function openWindowByFile(file) {
+    // ✅ Directly call the correct function from windowManager.js
     const windowFunctions = {
-        "music-catalog": "openCatalogWindow",
-        "settings": "openSettingsWindow",
-        "about": "openAboutWindow"
+        "music-catalog": openCatalogWindow,
+        "settings": openSettingsWindow,
+        "about": openAboutWindow
     };
 
-    if (windowFunctions[file] && typeof window[windowFunctions[file]] === "function") {
-        window[windowFunctions[file]]();
-    } else if (typeof window.openGenericWindow === "function") {
-        window.openGenericWindow(file, file);
+    if (windowFunctions[file]) {
+        console.log(`🚀 Launching ${file} window...`);
+        windowFunctions[file]();
     } else {
-        showError(`open${capitalizeFirstLetter(file)}Window()`);
+        console.error(`❌ No function defined for ${file}`);
     }
 }
 
-// ✅ Capitalize Function for Error Logging
-function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
+// ✅ Handle Double Tap Events (Touchscreen)
+let touchStartTime = 0;
+function handleTouchStart(event) {
+    let icon = event.target.closest(".icon");
+    if (!icon) return;
 
-// ✅ Fallback Error Handler
-function showError(functionName) {
-    console.error(`❌ ${functionName} is not defined!`);
+    let now = Date.now();
+    let timeSinceLastTap = now - touchStartTime;
+
+    if (timeSinceLastTap < 300) { // ✅ Detect double tap within 300ms
+        handleIconDoubleClick(event);
+    }
+
+    touchStartTime = now;
 }
 
 // ✅ Ensure Script Loads Properly

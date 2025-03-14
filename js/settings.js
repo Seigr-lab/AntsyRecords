@@ -41,19 +41,10 @@ document.addEventListener("DOMContentLoaded", () => {
         themeSelect.value = savedTheme;
 
         backgroundType.value = savedBackgroundType;
-        if (savedBackgroundType === "color") {
-            document.documentElement.style.setProperty("--desktop-bg-color", savedBackgroundColor);
-            backgroundColorPicker.value = savedBackgroundColor;
-            removeBackgroundButton.style.display = "none";
-        } else if (savedBackgroundType === "image" && savedBackgroundImage) {
-            document.documentElement.style.setProperty("--desktop-bg", `url(${savedBackgroundImage})`);
-            removeBackgroundButton.style.display = "block";
-        } else {
-            removeBackgroundButton.style.display = "none";
-        }
+        updateBackgroundUI(savedBackgroundType, savedBackgroundColor, savedBackgroundImage);
 
         fontSizeSelect.value = savedFontSize;
-        document.documentElement.style.setProperty("font-size", savedFontSize === "default" ? "16px" : savedFontSize);
+        document.documentElement.style.setProperty("font-size", validateFontSize(savedFontSize));
 
         iconSizeInput.value = savedIconSize;
         if (typeof window.updateIconSizes === "function") {
@@ -63,18 +54,49 @@ document.addEventListener("DOMContentLoaded", () => {
         settingsChanged = false;
     }
 
+    // ✅ Dynamically Adjust UI Based on Background Type Selection
+    function updateBackgroundUI(type, color, image) {
+        if (type === "color") {
+            document.documentElement.style.setProperty("--desktop-bg-color", color);
+            backgroundColorPicker.value = color;
+            backgroundColorPicker.style.display = "block";
+            backgroundImageUpload.style.display = "none";
+            if (removeBackgroundButton) removeBackgroundButton.style.display = "none";
+        } else if (type === "image" && image) {
+            document.documentElement.style.setProperty("--desktop-bg", `url(${image})`);
+            backgroundColorPicker.style.display = "none";
+            backgroundImageUpload.style.display = "block";
+            if (removeBackgroundButton) removeBackgroundButton.style.display = "block";
+        } else {
+            backgroundColorPicker.style.display = "none";
+            backgroundImageUpload.style.display = "none";
+            if (removeBackgroundButton) removeBackgroundButton.style.display = "none";
+        }
+    }
+
+    // ✅ Validate Font Size
+    function validateFontSize(size) {
+        const validSizes = ["default", "large", "x-large"];
+        return validSizes.includes(size) ? size : "16px";
+    }
+
     // ✅ Event Listeners for Changes
     function trackChange() {
         settingsChanged = true;
     }
 
     themeSelect.addEventListener("change", trackChange);
-    backgroundType.addEventListener("change", trackChange);
+    backgroundType.addEventListener("change", () => {
+        trackChange();
+        updateBackgroundUI(backgroundType.value, backgroundColorPicker.value, localStorage.getItem("backgroundImage"));
+    });
+
     backgroundColorPicker.addEventListener("input", trackChange);
     backgroundImageUpload.addEventListener("change", trackChange);
     fontSizeSelect.addEventListener("change", trackChange);
     iconSizeInput.addEventListener("input", trackChange);
 
+    // ✅ Handle Background Image Upload
     backgroundImageUpload.addEventListener("change", (event) => {
         const file = event.target.files[0];
         if (file) {
@@ -82,18 +104,21 @@ document.addEventListener("DOMContentLoaded", () => {
             reader.onload = (e) => {
                 document.documentElement.style.setProperty("--desktop-bg", `url(${e.target.result})`);
                 localStorage.setItem("backgroundImage", e.target.result);
-                removeBackgroundButton.style.display = "block";
+                if (removeBackgroundButton) removeBackgroundButton.style.display = "block";
             };
             reader.readAsDataURL(file);
         }
     });
 
-    removeBackgroundButton.addEventListener("click", () => {
-        document.documentElement.style.removeProperty("--desktop-bg");
-        localStorage.removeItem("backgroundImage");
-        removeBackgroundButton.style.display = "none";
-        settingsChanged = true;
-    });
+    // ✅ Remove Background Image
+    if (removeBackgroundButton) {
+        removeBackgroundButton.addEventListener("click", () => {
+            document.documentElement.style.removeProperty("--desktop-bg");
+            localStorage.removeItem("backgroundImage");
+            removeBackgroundButton.style.display = "none";
+            settingsChanged = true;
+        });
+    }
 
     // ✅ Save & Reset Buttons
     saveButton.addEventListener("click", () => {
@@ -102,11 +127,18 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        localStorage.setItem("theme", themeSelect.value);
-        localStorage.setItem("backgroundType", backgroundType.value);
-        localStorage.setItem("backgroundColor", backgroundColorPicker.value);
-        localStorage.setItem("fontSize", fontSizeSelect.value);
-        localStorage.setItem("iconSize", iconSizeInput.value);
+        const newTheme = themeSelect.value;
+        const newBackgroundType = backgroundType.value;
+        const newBackgroundColor = backgroundColorPicker.value;
+        const newFontSize = fontSizeSelect.value;
+        const newIconSize = iconSizeInput.value;
+
+        // ✅ Only save if values have changed
+        if (newTheme !== localStorage.getItem("theme")) localStorage.setItem("theme", newTheme);
+        if (newBackgroundType !== localStorage.getItem("backgroundType")) localStorage.setItem("backgroundType", newBackgroundType);
+        if (newBackgroundColor !== localStorage.getItem("backgroundColor")) localStorage.setItem("backgroundColor", newBackgroundColor);
+        if (newFontSize !== localStorage.getItem("fontSize")) localStorage.setItem("fontSize", newFontSize);
+        if (newIconSize !== localStorage.getItem("iconSize")) localStorage.setItem("iconSize", newIconSize);
 
         alert("✅ Settings saved successfully!");
         applySettings();

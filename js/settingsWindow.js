@@ -1,31 +1,25 @@
 // ✅ settingsWindow.js - Manages Settings Window Creation
 console.log("⚙️ Settings Window Manager Loaded");
 
-import { initializeSettingsLogic } from "./settings.js"; // ✅ Import settings logic
-
-const MAX_RETRIES = 3;
-let retryCount = 0;
+// ✅ Ensure Proper Imports
+import { initializeSettingsLogic } from "./settings.js"; 
 
 // ✅ Open Settings Window
 export function openSettingsWindow() {
     console.log("⚙️ Opening Settings Window...");
 
     // ✅ Prevent multiple instances
-    if (document.getElementById("settings-window")) {
-        bringWindowToFront(document.getElementById("settings-window"));
-        return;
-    }
+    if (document.getElementById("settings-window")) return;
 
-    // ✅ Create Settings Window
     let win = document.createElement("div");
     win.id = "settings-window";
     win.classList.add("window");
 
-    // ✅ Ensure the window stays within the visible screen
+    // ✅ Ensure it stays within visible screen
     const winWidth = 400;
     const winHeight = 300;
-    const leftPos = Math.min(100 + Math.random() * 300, window.innerWidth - winWidth);
-    const topPos = Math.min(100 + Math.random() * 200, window.innerHeight - winHeight);
+    const leftPos = Math.min(100 + Math.random() * 300, window.innerWidth - winWidth - 20);
+    const topPos = Math.min(100 + Math.random() * 200, window.innerHeight - winHeight - 20);
 
     win.style.position = "absolute";
     win.style.left = `${Math.max(20, leftPos)}px`;
@@ -33,51 +27,51 @@ export function openSettingsWindow() {
     win.style.width = `${winWidth}px`;
     win.style.height = "auto";
     win.style.zIndex = "100";
-    win.style.minWidth = "350px"; // ✅ Prevents shrinking too much
-    win.style.minHeight = "250px"; // ✅ Prevents window from being too small
+    win.style.minWidth = "350px";
+    win.style.minHeight = "250px";
 
+    // ✅ Base window structure
     win.innerHTML = `
         <div class="window-header">
             <span>Settings</span>
             <button class="close-btn">✖</button>
         </div>
         <div class="window-content" id="settings-content">
-            <p style="color: red;">Loading settings...</p>
+            <p style="color: white; text-align: center;">Loading settings...</p>
         </div>
     `;
 
     document.getElementById("window-container").appendChild(win);
 
-    bringWindowToFront(win);
-    makeDraggable(win);
-    makeResizable(win);
+    // ✅ Dragging & Resizing
+    if (typeof makeDraggable === "function") makeDraggable(win);
+    if (typeof makeResizable === "function") makeResizable(win);
 
     win.querySelector(".close-btn").addEventListener("click", () => {
         win.remove();
     });
 
-    // ✅ Load settings UI content dynamically
-    loadSettingsContent(document.getElementById("settings-content"));
+    // ✅ Load Settings UI
+    loadSettingsContent();
 }
 
-// ✅ Load Settings HTML and Apply JavaScript Logic
-function loadSettingsContent(contentDiv) {
+// ✅ Load Settings UI and Apply Logic
+export function loadSettingsContent() {
     fetch("windows/settings.html")
-        .then(response => response.text())
-        .then(html => {
-            contentDiv.innerHTML = html;
-            initializeSettingsLogic(); // ✅ Ensure settings logic is applied
+        .then(response => {
+            if (!response.ok) throw new Error("❌ Failed to fetch settings.html");
+            return response.text();
         })
-        .catch(() => {
-            if (retryCount < MAX_RETRIES) {
-                retryCount++;
-                console.warn(`🔄 Retrying to load settings... (${retryCount}/${MAX_RETRIES})`);
-                setTimeout(() => loadSettingsContent(contentDiv), 2000);
-            } else {
-                contentDiv.innerHTML = `<p style="color:red;">❌ Failed to load settings.</p>`;
-            }
+        .then(html => {
+            document.getElementById("settings-content").innerHTML = html;
+            initializeSettingsLogic();
+        })
+        .catch(error => {
+            console.error(error);
+            document.getElementById("settings-content").innerHTML = `<p style="color:red;">❌ Failed to load settings.</p>`;
         });
 }
 
-// ✅ Make globally available
+// ✅ Ensure Global Access for Legacy Support
 window.openSettingsWindow = openSettingsWindow;
+window.loadSettingsContent = loadSettingsContent;

@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Music Player</title>
+
+    <!-- ✅ Load Required Styles -->
     <link rel="stylesheet" href="../css/windows.css">
     <link rel="stylesheet" href="../css/player.css">
 </head>
@@ -37,21 +39,7 @@
         </div>
     </div>
 
+    <!-- ✅ Modular JavaScript -->
     <script src="../js/playerWindow.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            // ✅ Hook Close Button Properly
-            const closeButton = document.querySelector(".close-btn");
-            if (closeButton) {
-                closeButton.addEventListener("click", () => {
-                    if (typeof window.closePlayerWindow === "function") {
-                        window.closePlayerWindow();
-                    } else {
-                        console.error("❌ closePlayerWindow() is not defined!");
-                    }
-                });
-            }
-        });
-    </script>
 </body>
 </html>

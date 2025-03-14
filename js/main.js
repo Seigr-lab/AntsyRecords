@@ -17,11 +17,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // ✅ Defer Bandcamp API Calls for Better Performance
     function fetchBandcamp() {
         try {
-            if (typeof fetchBandcampReleases === "function") {
-                fetchBandcampReleases();
+            if (typeof fetchAndDisplayReleases === "function") {
+                fetchAndDisplayReleases();
                 console.log("🎵 Fetching Bandcamp Releases...");
             } else {
-                console.warn("⚠️ fetchBandcampReleases() is not defined.");
+                console.warn("⚠️ fetchAndDisplayReleases() is not defined.");
             }
         } catch (error) {
             console.error("❌ Error fetching Bandcamp releases:", error);

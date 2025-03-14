@@ -9,10 +9,10 @@ document.addEventListener("DOMContentLoaded", () => {
     async function openPlayerWindow(albumId) {
         console.log(`🎵 Opening Player Window for Album ID: ${albumId}`);
 
-        // ✅ Prevent multiple instances
         let existingWindow = document.getElementById("music-player-window");
         if (existingWindow) {
             bringWindowToFront(existingWindow);
+            updatePlayerWindow(existingWindow, albumId); // ✅ Update instead of creating duplicate
             return;
         }
 
@@ -22,16 +22,21 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // ✅ Create player window
+        // ✅ Ensure #window-container exists
+        let windowContainer = document.getElementById("window-container");
+        if (!windowContainer) {
+            console.error("❌ #window-container is missing! Cannot open player.");
+            return;
+        }
+
         let win = document.createElement("div");
         win.id = "music-player-window";
         win.classList.add("window", "player-window");
         positionWindow(win);
 
-        // ✅ Generate player UI
         win.innerHTML = generatePlayerUI(albumData);
+        windowContainer.appendChild(win);
 
-        document.getElementById("window-container").appendChild(win);
         bringWindowToFront(win);
         makeDraggable(win);
         makeResizable(win);
@@ -43,6 +48,18 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         console.timeEnd("⏱️ Player Window Load Time");
+    }
+
+    // ✅ Update existing player window instead of creating duplicates
+    async function updatePlayerWindow(win, albumId) {
+        let albumData = await fetchAlbumData(albumId);
+        if (!albumData) {
+            console.error("❌ Failed to update album data.");
+            return;
+        }
+
+        win.innerHTML = generatePlayerUI(albumData);
+        setupTrackSelection(win); // ✅ Reinitialize track selection
     }
 
     function generatePlayerUI(albumData) {
@@ -71,21 +88,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function setupTrackSelection(win) {
-        let tracklist = win.querySelectorAll(".track-item");
+        let tracklist = win.querySelector("#tracklist");
         let audioPlayer = win.querySelector("#custom-audio-player");
         let audioSource = win.querySelector("#audio-source");
 
-        tracklist.forEach(track => {
-            track.addEventListener("click", function () {
-                let trackUrl = this.getAttribute("data-url");
-                if (audioSource.src === trackUrl && !audioPlayer.paused) {
-                    audioPlayer.pause();
-                } else {
-                    audioSource.src = trackUrl;
-                    audioPlayer.load();
-                    audioPlayer.play();
-                }
-            });
+        // ✅ Use event delegation to avoid multiple event bindings
+        tracklist.addEventListener("click", function (event) {
+            let track = event.target.closest(".track-item");
+            if (!track) return;
+
+            let trackUrl = track.getAttribute("data-url");
+            if (!trackUrl) return;
+
+            if (audioSource.src !== trackUrl) {
+                audioSource.src = trackUrl;
+                audioPlayer.load();
+            }
+
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+            } else {
+                audioPlayer.pause();
+            }
         });
     }
 

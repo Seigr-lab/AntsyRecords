@@ -1,7 +1,14 @@
 // ✅ resizeHandler.js - Enables Window Resizing
 console.log("📏 Resizable Window Handler Loaded");
 
-function makeResizable(el) {
+// ✅ Make an element resizable
+export function makeResizable(el) { // ✅ NOW EXPORTED
+    // ✅ Prevent duplicate resize handles
+    if (el.querySelector(".resize-handle")) {
+        console.warn("⚠️ Resize handle already exists on element.");
+        return;
+    }
+
     const resizeHandle = document.createElement("div");
     resizeHandle.classList.add("resize-handle");
     el.appendChild(resizeHandle);
@@ -17,8 +24,7 @@ function makeResizable(el) {
         startHeight = el.offsetHeight;
 
         document.addEventListener("mousemove", resize);
-        document.addEventListener("mouseup", stopResizing);
-        document.addEventListener("mouseleave", stopResizing);
+        document.addEventListener("mouseup", stopResizing, { once: true });
         document.addEventListener("touchmove", resize, { passive: false });
         document.addEventListener("touchend", stopResizing, { once: true });
     }
@@ -41,8 +47,6 @@ function makeResizable(el) {
     function stopResizing() {
         isResizing = false;
         document.removeEventListener("mousemove", resize);
-        document.removeEventListener("mouseup", stopResizing);
-        document.removeEventListener("mouseleave", stopResizing);
         document.removeEventListener("touchmove", resize);
     }
 
@@ -52,16 +56,16 @@ function makeResizable(el) {
     // ✅ Improved Visual Feedback & Accessibility
     Object.assign(resizeHandle.style, {
         position: "absolute",
-        bottom: "0",
-        right: "0",
-        width: "18px",
-        height: "18px",
+        bottom: "4px",
+        right: "4px",
+        width: "14px",
+        height: "14px",
         background: "rgba(255, 255, 255, 0.8)",
         cursor: "nwse-resize",
         borderRadius: "4px",
         zIndex: "999",
-        border: "2px solid #333",
-        opacity: "0.9",
+        border: "1px solid #333",
+        opacity: "0.8",
     });
 
     console.log("✅ Resizable Feature Added!");

@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Music Catalog</title>
+
+    <!-- ✅ Load Required Styles -->
     <link rel="stylesheet" href="../css/windows.css">
     <link rel="stylesheet" href="../css/catalog.css">
 </head>
@@ -20,21 +22,7 @@
         </div>
     </div>
 
+    <!-- ✅ Modular JavaScript -->
     <script src="../js/catalogWindow.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            // ✅ Hook Close Button Correctly
-            const closeButton = document.querySelector(".close-btn");
-            if (closeButton) {
-                closeButton.addEventListener("click", () => {
-                    if (typeof window.closeCatalogWindow === "function") {
-                        window.closeCatalogWindow();
-                    } else {
-                        console.error("❌ closeCatalogWindow() is not defined!");
-                    }
-                });
-            }
-        });
-    </script>
 </body>
 </html>

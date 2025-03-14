@@ -1,7 +1,8 @@
 // ✅ iconHandler.js - Handles Icon Layout & Positioning
 console.log("🎨 Initializing Desktop Icons...");
 
-function initializeIcons() {
+// ✅ Ensure Function is Exported
+export function initializeIcons() {
     console.log("🖥 Organizing Desktop Icons...");
 
     const icons = document.querySelectorAll(".icon");
@@ -19,10 +20,29 @@ function initializeIcons() {
     let iconSize = parseInt(localStorage.getItem("iconSize") || 80, 10);
     const padding = 20; // Minimum spacing between icons
     const columns = Math.max(1, Math.floor(containerWidth / (iconSize + padding)));
-    let x = 0, y = 0;
 
-    // ✅ Position Icons in a Grid Layout
+    let x = 0, y = containerHeight - iconSize - padding; // ✅ Start from bottom-left
+
+    // ✅ Load saved icon positions (if available)
+    let savedPositions = JSON.parse(localStorage.getItem("iconPositions")) || {};
+
     icons.forEach((icon, index) => {
+        let iconId = icon.getAttribute("data-id") || `icon-${index}`;
+
+        // ✅ Restore saved positions if available
+        if (savedPositions[iconId]) {
+            x = savedPositions[iconId].x;
+            y = savedPositions[iconId].y;
+        } else {
+            // ✅ Auto-arrange in a grid layout if no saved position
+            if ((index + 1) % columns === 0) {
+                x = 0;
+                y -= iconSize + padding; // ✅ Move up a row
+            } else {
+                x += iconSize + padding;
+            }
+        }
+
         icon.style.left = `${x}px`;
         icon.style.top = `${y}px`;
         icon.style.width = `${iconSize}px`;
@@ -36,42 +56,17 @@ function initializeIcons() {
 
         console.log(`📌 Positioned: ${icon.innerText.trim()} at (${x}px, ${y}px)`);
 
-        // ✅ Move to the next grid position
-        if ((index + 1) % columns === 0) {
-            x = 0;
-            y += iconSize + padding;
-        } else {
-            x += iconSize + padding;
-        }
+        // ✅ Save positions
+        savedPositions[iconId] = { x, y };
 
-        // ✅ Ensure icons never overflow the container
-        if (y + iconSize > containerHeight) {
+        // ✅ Prevent overflow
+        if (y < 0) {
             console.warn(`⚠️ Not enough space for all icons! Some may be hidden.`);
         }
     });
+
+    localStorage.setItem("iconPositions", JSON.stringify(savedPositions));
 }
 
-// ✅ Smooth Dynamic Icon Resizing
-function updateIconSizes() {
-    console.log("🔄 Updating Icon Sizes...");
-    let newSize = parseInt(localStorage.getItem("iconSize") || 80, 10);
-
-    document.querySelectorAll(".icon").forEach(icon => {
-        icon.style.transition = "width 0.2s ease, height 0.2s ease";
-        icon.style.width = `${newSize}px`;
-        icon.style.height = `${newSize}px`;
-
-        let img = icon.querySelector("img");
-        if (img) {
-            img.style.width = `${newSize}px`;
-            img.style.height = `${newSize}px`;
-        }
-    });
-
-    // ✅ Recalculate Icon Positions After Resize
-    setTimeout(initializeIcons, 250);
-}
-
-// ✅ Expose functions globally
-window.initializeIcons = initializeIcons;
-window.updateIconSizes = updateIconSizes;
+// ✅ Ensure Script Loads Properly
+document.addEventListener("DOMContentLoaded", initializeIcons);

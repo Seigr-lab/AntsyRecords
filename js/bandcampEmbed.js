@@ -11,23 +11,23 @@ async function fetchAndDisplayReleases() {
     if (!catalogContainer) {
         console.error("❌ Music catalog container not found!");
 
-        // ✅ Limit retries to prevent infinite loops
         if (retryCount < MAX_RETRIES) {
             retryCount++;
-            console.warn(`🔄 Retrying... (${retryCount}/${MAX_RETRIES})`);
-            setTimeout(fetchAndDisplayReleases, 500);
+            let delay = Math.pow(2, retryCount) * 500; // ✅ Exponential Backoff (500ms, 1s, 2s, 4s, etc.)
+            console.warn(`🔄 Retrying in ${delay / 1000}s... (${retryCount}/${MAX_RETRIES})`);
+            setTimeout(fetchAndDisplayReleases, delay);
         } else {
             console.error("❌ Max retries reached. Stopping fetch attempts.");
         }
         return;
     }
 
-    catalogContainer.innerHTML = "";
+    catalogContainer.innerHTML = `<p style="color: white;">Loading releases...</p>`;
     catalogContainer.classList.add("music-catalog-container");
 
     try {
-        let releases = await fetchBandcampReleases(); // ✅ Use API instead of `releases.json`
-        
+        let releases = await fetchBandcampReleases();
+
         if (!Array.isArray(releases) || releases.length === 0) {
             console.warn("⚠️ No releases found.");
             catalogContainer.innerHTML = `<p style="color: yellow;">No releases available.</p>`;
@@ -35,6 +35,7 @@ async function fetchAndDisplayReleases() {
         }
 
         console.log("✅ Loaded Releases:", releases);
+        catalogContainer.innerHTML = ""; // ✅ Clear previous content before appending
 
         releases.forEach(release => {
             let item = document.createElement("div");
@@ -42,9 +43,8 @@ async function fetchAndDisplayReleases() {
             item.setAttribute("data-album-id", release.albumId);
             item.setAttribute("data-artist", release.artist);
             item.setAttribute("data-title", release.title);
-            item.setAttribute("draggable", "true");
+            item.setAttribute("draggable", "true"); // ✅ Ensures all icons are draggable
 
-            // ✅ Use a default image if no cover is available
             let coverImage = release.cover || "icons/default-cover.png";
 
             item.innerHTML = `
@@ -52,16 +52,25 @@ async function fetchAndDisplayReleases() {
                 <span>${release.artist} - ${release.title}</span>
             `;
 
-            item.addEventListener("dblclick", () =>
-                openPlayerWindow(release.albumId, release.title, release.artist)
-            );
+            // ✅ Verify `window.openPlayerWindow` exists before using it
+            if (typeof window.openPlayerWindow === "function") {
+                item.addEventListener("dblclick", () => {
+                    console.log(`🎵 Opening player for album: ${release.title}`);
+                    window.openPlayerWindow(release.albumId, release.title, release.artist);
+                });
+            } else {
+                console.error("❌ openPlayerWindow() is not defined! Ensure playerWindow.js is loaded.");
+            }
 
             catalogContainer.appendChild(item);
         });
 
-        // ✅ Adjust window size safely
-        if (typeof adjustCatalogWindowSize === "function") {
-            adjustCatalogWindowSize();
+        // ✅ Ensure the catalog window is resized properly
+        if (typeof window.adjustCatalogWindowSize === "function") {
+            console.log("📏 Adjusting catalog window size...");
+            window.adjustCatalogWindowSize();
+        } else {
+            console.warn("⚠️ adjustCatalogWindowSize() is not defined. Ensure catalogWindow.js is loaded.");
         }
     } catch (error) {
         console.error("❌ Error loading Bandcamp releases:", error);
@@ -69,5 +78,5 @@ async function fetchAndDisplayReleases() {
     }
 }
 
-// ✅ Make function globally accessible
+// ✅ Ensure function is globally accessible
 window.fetchAndDisplayReleases = fetchAndDisplayReleases;
