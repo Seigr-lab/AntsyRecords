@@ -1,19 +1,100 @@
+/* 📱 Tablet & Small Screens (Max Width: 768px) */
 @media (max-width: 768px) {
     .window {
-        max-width: 80vw;
-        max-height: 80vh;
+        max-width: 85vw;
+        max-height: 85vh;
     }
 
     .icon {
-        width: 60px;
+        width: 65px;
+        height: 65px;
     }
 
     .icon img {
-        width: 60px;
-        height: 60px;
+        width: 65px;
+        height: 65px;
     }
 
     .icon span {
         font-size: 12px;
+    }
+
+    /* 🎵 Music Catalog Adjustments */
+    .music-catalog-container {
+        padding: 8px;
+    }
+
+    .music-catalog-container .icon {
+        width: 100px;
+    }
+
+    .music-catalog-container .icon img {
+        width: 85px;
+        height: 85px;
+    }
+
+    /* 🎼 Player Window Adjustments */
+    .player-window {
+        width: 90vw;
+        height: auto;
+    }
+
+    #custom-audio-player {
+        width: 100%;
+    }
+
+    /* ✅ Improve Touch Usability */
+    .window-header {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .window-header button {
+        padding: 5px 10px;
+    }
+}
+
+/* 📱 Mobile-Friendly Layout (Max Width: 480px) */
+@media (max-width: 480px) {
+    .window {
+        width: 95vw;
+        max-height: 85vh;
+        min-width: 250px;
+        min-height: 200px;
+    }
+
+    .icon {
+        width: 55px;
+        height: 55px;
+    }
+
+    .icon img {
+        width: 55px;
+        height: 55px;
+    }
+
+    .icon span {
+        font-size: 11px;
+    }
+
+    /* 🎵 Music Catalog Icons */
+    .music-catalog-container .icon {
+        width: 90px;
+    }
+
+    .music-catalog-container .icon img {
+        width: 75px;
+        height: 75px;
+    }
+
+    /* 🎧 Tracklist Scroll Adjustments */
+    #tracklist {
+        max-height: 100px;
+    }
+
+    /* 📜 Tooltip Adjustments */
+    .tooltip {
+        font-size: 11px;
+        padding: 4px 8px;
     }
 }

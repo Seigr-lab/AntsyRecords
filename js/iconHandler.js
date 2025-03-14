@@ -1,9 +1,10 @@
+// ✅ iconHandler.js - Handles Icon Layout & Positioning
+console.log("🎨 Initializing Desktop Icons...");
+
 function initializeIcons() {
-    console.log("🎨 Initializing Desktop Icons...");
+    console.log("🖥 Organizing Desktop Icons...");
 
     const icons = document.querySelectorAll(".icon");
-    const iconSize = 80; // Icon dimensions
-    const padding = 20;  // Padding for spacing
     const desktopContainer = document.getElementById("desktop-container");
 
     if (!desktopContainer) {
@@ -14,6 +15,10 @@ function initializeIcons() {
     const containerWidth = desktopContainer.clientWidth;
     const containerHeight = desktopContainer.clientHeight;
     const usedPositions = [];
+
+    // ✅ Get user-defined icon size (Default: 80px)
+    let iconSize = parseInt(localStorage.getItem("iconSize") || 80, 10);
+    const padding = 20; // Minimum spacing between icons
 
     // ✅ Dynamically Position Icons Without Overlap
     icons.forEach(icon => {
@@ -31,15 +36,17 @@ function initializeIcons() {
             attempts++;
         }
 
+        // ✅ Apply Position & Size
         icon.style.left = `${left}px`;
         icon.style.top = `${top}px`;
+        icon.style.width = `${iconSize}px`;
+        icon.style.height = `${iconSize}px`;
 
-        // ✅ Attach Double-Click / Tap Event
-        icon.addEventListener("dblclick", () => handleIconClick(icon));
-        icon.addEventListener("touchstart", (event) => {
-            event.preventDefault();
-            handleIconClick(icon);
-        }, { passive: true });
+        let img = icon.querySelector("img");
+        if (img) {
+            img.style.width = `${iconSize}px`;
+            img.style.height = `${iconSize}px`;
+        }
 
         console.log(`📌 Positioned: ${icon.innerText.trim()} at (${left}px, ${top}px)`);
     });
@@ -52,28 +59,23 @@ function initializeIcons() {
     }
 }
 
-// ✅ Handle Icon Clicks to Open Correct Windows
-function handleIconClick(icon) {
-    const file = icon.getAttribute("data-file");
+// ✅ Allow Dynamic Icon Resizing
+function updateIconSizes() {
+    console.log("🔄 Updating Icon Sizes...");
+    let newSize = parseInt(localStorage.getItem("iconSize") || 80, 10);
 
-    if (!file) {
-        console.error("❌ No file associated with this icon.");
-        return;
-    }
+    document.querySelectorAll(".icon").forEach(icon => {
+        icon.style.width = `${newSize}px`;
+        icon.style.height = `${newSize}px`;
 
-    console.log(`📂 Opening: ${file}`);
-
-    if (file === "music-catalog") {
-        openCatalogWindow();  // ✅ Opens dedicated music catalog window
-    } else {
-        openWindow(file, capitalizeFirstLetter(file));  // ✅ Opens general windows
-    }
+        let img = icon.querySelector("img");
+        if (img) {
+            img.style.width = `${newSize}px`;
+            img.style.height = `${newSize}px`;
+        }
+    });
 }
 
-// ✅ Capitalizes First Letter for Window Titles
-function capitalizeFirstLetter(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-// ✅ Ensure This Function is Available Globally
+// ✅ Expose functions globally
 window.initializeIcons = initializeIcons;
+window.updateIconSizes = updateIconSizes;

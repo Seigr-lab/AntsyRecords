@@ -17,15 +17,12 @@ function startDragging(event, icon, isTouch = false) {
 
     let container = icon.closest(".music-catalog-container") || document.getElementById("desktop-container");
     let containerRect = container.getBoundingClientRect();
-    let iconSize = 80;
-    let isDragging = false;
+    let iconSize = icon.offsetWidth; // Dynamically adjust based on actual icon size
+    let isDragging = true;
 
-    function moveAt(x, y) {
-        let newLeft = x - shiftX;
-        let newTop = y - shiftY;
-
-        newLeft = Math.max(0, Math.min(containerRect.width - iconSize, newLeft));
-        newTop = Math.max(0, Math.min(containerRect.height - iconSize, newTop));
+    function moveAt(clientX, clientY) {
+        let newLeft = Math.max(0, Math.min(clientX - shiftX - containerRect.left, containerRect.width - iconSize));
+        let newTop = Math.max(0, Math.min(clientY - shiftY - containerRect.top, containerRect.height - iconSize));
 
         icon.style.position = "absolute";
         icon.style.zIndex = "100";
@@ -34,9 +31,10 @@ function startDragging(event, icon, isTouch = false) {
     }
 
     function onMove(event) {
+        if (!isDragging) return;
         let clientX = isTouch ? event.touches[0].clientX : event.clientX;
         let clientY = isTouch ? event.touches[0].clientY : event.clientY;
-        moveAt(clientX - containerRect.left, clientY - containerRect.top);
+        moveAt(clientX, clientY);
     }
 
     function stopDragging() {

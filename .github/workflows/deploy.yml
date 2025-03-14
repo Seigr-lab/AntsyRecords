@@ -1,0 +1,21 @@
+name: Deploy AntsyRecords to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Inject Bandcamp Secrets into credentials.js
+        run: |
+          echo "export const BANDCAMP_CLIENT_ID = '${{ secrets.BANDCAMP_CLIENT_ID }}';" > credentials.js
+          echo "export const BANDCAMP_CLIENT_SECRET = '${{ secrets.BANDCAMP_CLIENT_SECRET }}';" >> credentials.js
+
+      - name: Deploy to GitHub Pages
+        uses: actions/upload-pages-artifact@v1

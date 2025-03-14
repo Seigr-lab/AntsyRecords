@@ -1,10 +1,18 @@
-document.addEventListener("DOMContentLoaded", () => {
-    console.log("🎵 Player Window Manager Loaded");
+import { fetchAlbumData } from "./bandcampAPI.js";
 
-    function openPlayerWindow(albumId, albumTitle, artist) {
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("🎵 Custom Player Window Manager Loaded");
+
+    async function openPlayerWindow(albumId) {
         let existingWindow = document.getElementById("music-player-window");
         if (existingWindow) {
             bringWindowToFront(existingWindow);
+            return;
+        }
+
+        let albumData = await fetchAlbumData(albumId);
+        if (!albumData) {
+            console.error("❌ Failed to load album data.");
             return;
         }
 
@@ -12,18 +20,32 @@ document.addEventListener("DOMContentLoaded", () => {
         win.id = "music-player-window";
         win.classList.add("window", "player-window");
 
+        let leftPos = Math.max(50, Math.min(100 + Math.random() * 300, window.innerWidth - 400));
+        let topPos = Math.max(50, Math.min(100 + Math.random() * 200, window.innerHeight - 300));
+
         win.style.position = "absolute";
-        win.style.left = `${Math.min(100 + Math.random() * 300, window.innerWidth - 320)}px`;
-        win.style.top = `${Math.min(100 + Math.random() * 200, window.innerHeight - 250)}px`;
+        win.style.left = `${leftPos}px`;
+        win.style.top = `${topPos}px`;
         win.style.zIndex = "100";
 
+        // ✅ Generate HTML for Custom Player
         win.innerHTML = `
             <div class="window-header">
-                <span>${artist} - ${albumTitle}</span>
+                <span>${albumData.artist} - ${albumData.albumTitle}</span>
                 <button class="close-btn">✖</button>
             </div>
             <div class="window-content player-content">
-                <p style="color: red;">Loading player...</p>
+                <img src="${albumData.coverUrl}" alt="Album Cover" class="album-cover">
+                <audio id="custom-audio-player" controls>
+                    <source id="audio-source" src="${albumData.tracks[0].streamUrl}" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+                <ul id="tracklist">
+                    ${albumData.tracks.map((track, index) => `
+                        <li class="track-item" data-url="${track.streamUrl}">
+                            ${index + 1}. ${track.title}
+                        </li>`).join("")}
+                </ul>
             </div>
         `;
 
@@ -37,7 +59,22 @@ document.addEventListener("DOMContentLoaded", () => {
             closePlayerWindow();
         });
 
-        embedBandcamp(win, albumId);
+        setupTrackSelection(win);
+    }
+
+    function setupTrackSelection(win) {
+        let tracklist = win.querySelectorAll(".track-item");
+        let audioPlayer = win.querySelector("#custom-audio-player");
+        let audioSource = win.querySelector("#audio-source");
+
+        tracklist.forEach(track => {
+            track.addEventListener("click", function () {
+                let trackUrl = this.getAttribute("data-url");
+                audioSource.src = trackUrl;
+                audioPlayer.load();
+                audioPlayer.play();
+            });
+        });
     }
 
     function closePlayerWindow() {
@@ -55,25 +92,42 @@ document.addEventListener("DOMContentLoaded", () => {
         let shiftX, shiftY;
         let isDragging = false;
 
-        function onMouseMove(event) {
-            if (!isDragging) return;
-            win.style.left = `${Math.max(0, Math.min(event.clientX - shiftX, window.innerWidth - win.offsetWidth))}px`;
-            win.style.top = `${Math.max(0, Math.min(event.clientY - shiftY, window.innerHeight - win.offsetHeight))}px`;
+        function moveWindow(clientX, clientY) {
+            let newLeft = Math.max(0, Math.min(clientX - shiftX, window.innerWidth - win.offsetWidth));
+            let newTop = Math.max(0, Math.min(clientY - shiftY, window.innerHeight - win.offsetHeight));
+            win.style.left = `${newLeft}px`;
+            win.style.top = `${newTop}px`;
         }
 
-        header.addEventListener("mousedown", function(event) {
+        function startDrag(event) {
             event.preventDefault();
             isDragging = true;
-            shiftX = event.clientX - win.getBoundingClientRect().left;
-            shiftY = event.clientY - win.getBoundingClientRect().top;
+
+            let clientX = event.touches ? event.touches[0].clientX : event.clientX;
+            let clientY = event.touches ? event.touches[0].clientY : event.clientY;
+            shiftX = clientX - win.getBoundingClientRect().left;
+            shiftY = clientY - win.getBoundingClientRect().top;
             bringWindowToFront(win);
 
-            document.addEventListener("mousemove", onMouseMove);
-            document.addEventListener("mouseup", function() {
-                isDragging = false;
-                document.removeEventListener("mousemove", onMouseMove);
-            }, { once: true });
-        });
+            document.addEventListener(event.type === "mousedown" ? "mousemove" : "touchmove", onMove);
+            document.addEventListener(event.type === "mousedown" ? "mouseup" : "touchend", stopDrag, { once: true });
+        }
+
+        function onMove(event) {
+            if (!isDragging) return;
+            let clientX = event.touches ? event.touches[0].clientX : event.clientX;
+            let clientY = event.touches ? event.touches[0].clientY : event.clientY;
+            moveWindow(clientX, clientY);
+        }
+
+        function stopDrag() {
+            isDragging = false;
+            document.removeEventListener("mousemove", onMove);
+            document.removeEventListener("touchmove", onMove);
+        }
+
+        header.addEventListener("mousedown", startDrag);
+        header.addEventListener("touchstart", startDrag, { passive: true });
 
         header.style.cursor = "grab";
     }
@@ -81,24 +135,6 @@ document.addEventListener("DOMContentLoaded", () => {
     function makeResizable(win) {
         win.style.resize = "both";
         win.style.overflow = "auto";
-    }
-
-    function embedBandcamp(win, albumId) {
-        let playerContainer = win.querySelector(".player-content");
-        if (!playerContainer) return;
-
-        let iframe = document.createElement("iframe");
-        iframe.src = `https://bandcamp.com/EmbeddedPlayer/album=${albumId}/size=large/bgcol=333333/linkcol=ffffff/artwork=small/transparent=true/`;
-        iframe.style.width = "100%";
-        iframe.style.height = "150px";
-        iframe.style.border = "none";
-
-        playerContainer.innerHTML = ""; // Clear previous content
-        playerContainer.appendChild(iframe);
-
-        // ✅ Adjust player window height dynamically
-        win.style.width = "400px"; // Fixed width for consistency
-        win.style.height = "200px"; // Slightly larger to fit iframe comfortably
     }
 
     window.openPlayerWindow = openPlayerWindow;

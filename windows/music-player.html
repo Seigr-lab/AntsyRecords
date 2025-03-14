@@ -1,8 +1,42 @@
-<div id="music-player-window">
-    <h2>Music Player</h2>
-    <iframe id="bandcamp-player" 
-        style="border: 0; width: 100%; height: 150px;" 
-        src="" 
-        seamless>
-    </iframe>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player</title>
+    <link rel="stylesheet" href="../css/windows.css">
+    <link rel="stylesheet" href="../css/player.css">
+</head>
+<body>
+    <div id="music-player-window" class="window">
+        <div class="window-header">
+            <span id="player-title">Music Player</span>
+            <button class="close-btn" onclick="closePlayerWindow()">✖</button>
+        </div>
+        
+        <div class="window-content player-content">
+            <!-- 🎵 Album Cover & Info -->
+            <div class="player-info">
+                <img id="album-cover" src="../media/default-album.png" alt="Album Cover">
+                <div>
+                    <h3 id="track-title">Track Title</h3>
+                    <p id="track-artist">Artist Name</p>
+                </div>
+            </div>
+
+            <!-- 🎧 Audio Controls -->
+            <audio id="custom-audio-player" controls>
+                <source id="audio-source" src="" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+
+            <!-- 📜 Tracklist -->
+            <ul id="tracklist">
+                <li class="track-item" data-url="">No tracks loaded</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="../js/playerWindow.js"></script>
+</body>
+</html>

@@ -1,12 +1,57 @@
-/* ✅ Tooltip */
+/* 🎨 Theme Variables for Tooltip Customization */
+:root {
+    --tooltip-bg: rgba(0, 0, 0, 0.85);
+    --tooltip-text: white;
+    --tooltip-padding: 6px 12px;
+    --tooltip-font-size: 12px;
+    --tooltip-radius: 5px;
+    --tooltip-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+/* ✅ Tooltip Base Styling */
 .tooltip {
     position: absolute;
-    background: rgba(0, 0, 0, 0.85);
-    color: white;
-    padding: 6px 12px;
-    font-size: 12px;
-    border-radius: 5px;
+    background: var(--tooltip-bg);
+    color: var(--tooltip-text);
+    padding: var(--tooltip-padding);
+    font-size: var(--tooltip-font-size);
+    border-radius: var(--tooltip-radius);
     display: none;
     pointer-events: none;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--tooltip-shadow);
+    transition: opacity 0.2s ease-in-out, transform 0.1s ease-in-out;
+    white-space: nowrap;
+    z-index: 150;
+}
+
+/* 🏗️ Tooltip Visibility */
+.tooltip.show {
+    display: block;
+    opacity: 1;
+    transform: translateY(-5px);
+}
+
+/* 🔺 Tooltip Arrow */
+.tooltip::after {
+    content: "";
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: var(--tooltip-bg) transparent transparent transparent;
+}
+
+/* ✅ Theme-Based Customization */
+[data-theme="light"] {
+    --tooltip-bg: rgba(255, 255, 255, 0.95);
+    --tooltip-text: black;
+    --tooltip-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="high-contrast"] {
+    --tooltip-bg: yellow;
+    --tooltip-text: black;
+    --tooltip-shadow: 2px 2px 5px rgba(255, 255, 0, 0.5);
 }

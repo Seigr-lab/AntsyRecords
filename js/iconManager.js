@@ -1,27 +1,47 @@
-function initializeIconManager() {
-    console.log("✅ Icon Manager Loaded");
+// ✅ iconManager.js - Handles Icon Click Interactions
+console.log("✅ Icon Manager Loaded");
 
-    document.querySelectorAll(".icon").forEach(icon => {
-        icon.addEventListener("dblclick", (event) => {
-            let file = icon.getAttribute("data-file");
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("🎨 Initializing Icon Manager...");
 
-            if (file === "AntsyRecords") {
-                window.location.href = "http://antsy.seigr.net";
-            } else if (file === "settings") {
-                openWindow("settings", "Settings");
-            } else if (file === "music-catalog") {
-                openWindow("music-catalog", "Music Catalog");
-            } else {
-                openWindow(file, icon.querySelector("span").innerText);
+    const icons = document.querySelectorAll(".icon");
+
+    icons.forEach(icon => {
+        let file = icon.getAttribute("data-file");
+        let url = icon.getAttribute("data-url");
+
+        if (url) {
+            // ✅ External Links
+            console.log(`🌐 Setting up link for: ${url}`);
+            icon.addEventListener("dblclick", () => {
+                console.log(`🌍 Navigating to: ${url}`);
+                window.location.href = url;
+            });
+            return;
+        }
+
+        // ✅ Handle Window Opening Dynamically
+        icon.addEventListener("dblclick", () => {
+            console.log(`📂 Opening: ${file}`);
+
+            if (!file) {
+                console.warn("⚠️ No valid file assigned to this icon.");
+                return;
             }
-        });
 
-        // ✅ Special handling for Bandcamp releases inside "Music Catalog"
-        icon.addEventListener("dblclick", (event) => {
-            let albumId = icon.getAttribute("data-album-id");
-            if (albumId) {
-                openWindow("music-player", "Music Player", albumId);
+            switch (file) {
+                case "music-catalog":
+                    window.openCatalogWindow?.() || console.error("❌ openCatalogWindow() is not defined!");
+                    break;
+                case "settings":
+                    window.openSettingsWindow?.() || console.error("❌ openSettingsWindow() is not defined!");
+                    break;
+                case "about":
+                    window.openAboutWindow?.() || console.error("❌ openAboutWindow() is not defined!");
+                    break;
+                default:
+                    window.openGenericWindow?.(file, file) || console.error("❌ openGenericWindow() is not defined!");
             }
         });
     });
-}
+});

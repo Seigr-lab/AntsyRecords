@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Antsy Records</title>
+    
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/desktop.css">
     <link rel="stylesheet" href="css/windows.css">
@@ -11,27 +13,62 @@
     <link rel="stylesheet" href="css/markdown.css">
     <link rel="stylesheet" href="css/tooltips.css">
     <link rel="stylesheet" href="css/ticker.css">
-    <link rel="stylesheet" href="css/media.css"> <!-- Optional for responsiveness -->
-    
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script defer src="js/main.js"></script>
-    <script defer src="js/iconHandler.js"></script>
-    <script defer src="js/windowManager.js"></script>
-    <script defer src="js/dragManager.js"></script>
-    <script defer src="js/iconManager.js"></script> <!-- Now modularized -->
-    <script defer src="js/resizeHandler.js"></script>
-    <script defer src="js/markdownLoader.js"></script>
-    <script defer src="js/catalogWindow.js"></script> 
-    <script defer src="js/bandcampEmbed.js"></script>
+    <link rel="stylesheet" href="css/media.css"> <!-- Responsive support -->
+    <link rel="stylesheet" href="css/player.css"> <!-- Music Player UI -->
+    <link rel="stylesheet" href="css/settings.css"> <!-- Settings UI -->
 
-    <!-- ✅ Explicit Initialization to Ensure Scripts Load Correctly -->
+    <!-- Markdown Support -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Core Managers -->
+    <script defer src="js/dragManager.js"></script>
+    <script defer src="js/windowManager.js"></script>
+    <script defer src="js/iconManager.js"></script> <!-- Must load before iconHandler -->
+    <script defer src="js/iconHandler.js"></script>
+    <script defer src="js/resizeHandler.js"></script>
+
+    <!-- Window and Content Loaders -->
+    <script type="module">
+        import "./js/catalogWindow.js";
+        import "./js/playerWindow.js";
+        import "./js/bandcampEmbed.js";
+        import "./js/settings.js";
+    </script>    
+
+    <!-- ✅ Ensure Proper Initialization -->
     <script defer>
-        document.addEventListener("DOMContentLoaded", () => {
+        document.addEventListener("DOMContentLoaded", async () => {
             console.log("✅ Ensuring Proper Initialization...");
-            initializeDragManager(); // Ensure icons are draggable
-            initializeIconManager(); // Ensure double-click actions work
+
+            // Ensure all core functions exist before calling them
+            if (typeof initializeDragManager === "function") {
+                initializeDragManager(); // Ensure icons are draggable
+            } else {
+                console.error("❌ initializeDragManager() is not defined!");
+            }
+
+            if (typeof initializeIcons === "function") {
+                initializeIcons(); // Ensure correct icon positioning
+            } else {
+                console.error("❌ initializeIcons() is not defined!");
+            }
+
+            if (typeof updateIconSizes === "function") {
+                updateIconSizes(); // Apply user settings
+            } else {
+                console.error("❌ updateIconSizes() is not defined!");
+            }
+
+            // Ensure module-based functions load dynamically
+            try {
+                const { initializeWindows } = await import("./js/windowManager.js");
+                initializeWindows();
+            } catch (err) {
+                console.error("❌ Failed to load windowManager module:", err);
+            }
         });
     </script>
+
 </head>
 <body>
     <div id="background-overlay"></div>
@@ -49,6 +86,23 @@
             <div class="icon" data-file="about">
                 <img src="icons/about.png" alt="About">
                 <span>About</span>
+            </div>
+
+            <!-- ⚙️ Settings Icon -->
+            <div class="icon" data-file="settings">
+                <img src="icons/settings.png" alt="Settings">
+                <span>Settings</span>
+            </div>
+
+            <!-- 🌐 Seamless Navigation Between Seigr Subdomains -->
+            <div class="icon shortcut" data-url="http://sonisk.seigr.net">
+                <img src="icons/audio.png" alt="Sonisk">
+                <span>Sonisk Seigr</span>
+            </div>
+
+            <div class="icon shortcut" data-url="http://seigr.net">
+                <img src="icons/seigr.png" alt="Seigr">
+                <span>Seigr</span>
             </div>
         </div>
     </div>

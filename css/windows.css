@@ -1,3 +1,19 @@
+/* 🌟 Theme Variables for User Customization */
+:root {
+    --window-bg: rgba(30, 30, 30, 0.95);
+    --window-border: #333;
+    --window-shadow: rgba(0, 0, 0, 0.6);
+    --header-bg: #222;
+    --header-text: white;
+    --close-btn-bg: red;
+    --close-btn-hover: darkred;
+    --window-content-bg: black;
+    --window-content-text: white;
+    --scrollbar-bg: #222;
+    --scrollbar-thumb: #555;
+    --scrollbar-thumb-hover: #777;
+}
+
 /* 🌟 Standard Window Styling */
 .window {
     position: absolute;
@@ -5,21 +21,28 @@
     min-height: 250px;
     max-width: 90vw;
     max-height: 90vh;
-    background: rgba(30, 30, 30, 0.95);
-    border: 2px solid #333;
-    border-radius: 5px;
-    box-shadow: 3px 3px 12px rgba(0, 0, 0, 0.6);
+    background: var(--window-bg);
+    border: 2px solid var(--window-border);
+    border-radius: 8px;
+    box-shadow: 4px 4px 14px var(--window-shadow);
     display: flex;
     flex-direction: column;
     resize: both;
     overflow: hidden;
     z-index: 100; /* Windows always above icons */
     pointer-events: auto; /* Ensures windows block interactions */
+    transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
+}
+
+/* ✅ Dragging Effect */
+.window.dragging {
+    opacity: 0.85;
+    box-shadow: 4px 4px 18px rgba(255, 255, 255, 0.2);
 }
 
 /* ✅ Window Header */
 .window-header {
-    background: #222;
+    background: var(--header-bg);
     padding: 8px 12px;
     display: flex;
     justify-content: space-between;
@@ -27,33 +50,40 @@
     cursor: grab;
     font-size: 14px;
     font-weight: bold;
-    color: white;
+    color: var(--header-text);
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
 }
 
+/* 🚀 Close Button */
 .window-header button {
-    background: red;
+    background: var(--close-btn-bg);
     border: none;
     color: white;
-    padding: 4px 8px;
+    padding: 5px 10px;
     cursor: pointer;
-    border-radius: 3px;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background 0.2s ease-in-out;
 }
 
 .window-header button:hover {
-    background: darkred;
+    background: var(--close-btn-hover);
 }
 
-/* ✅ Standard Window Content (Most Windows Use This) */
+/* ✅ Standard Window Content */
 .window-content {
-    padding: 10px;
+    padding: 12px;
     overflow-y: auto;
     flex-grow: 1;
     font-size: 14px;
     line-height: 1.6;
-    background: #000000;
-    color: white;
+    background: var(--window-content-bg);
+    color: var(--window-content-text);
     display: flex;
     flex-direction: column;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
 }
 
 /* ✅ Scrollbar Styling */
@@ -62,17 +92,17 @@
 }
 
 .window-content::-webkit-scrollbar-track {
-    background: #222;
+    background: var(--scrollbar-bg);
     border-radius: 5px;
 }
 
 .window-content::-webkit-scrollbar-thumb {
-    background: #555;
+    background: var(--scrollbar-thumb);
     border-radius: 5px;
 }
 
 .window-content::-webkit-scrollbar-thumb:hover {
-    background: #777;
+    background: var(--scrollbar-thumb-hover);
 }
 
 /* ✅ 🎵 Specialized Catalog Window */
@@ -82,4 +112,56 @@
     gap: 12px;
     padding: 10px;
     overflow-y: auto;
+}
+
+/* 🏗️ Resizable Window Handles */
+.window::after {
+    content: "";
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 15px;
+    height: 15px;
+    background: var(--scrollbar-thumb);
+    cursor: nwse-resize;
+    border-radius: 3px;
+}
+
+/* 🎭 Responsive Design */
+@media (max-width: 500px) {
+    .window {
+        width: 95%;
+        height: auto;
+    }
+}
+
+/* 🎨 Theme Overrides for User Settings */
+[data-theme="light"] {
+    --window-bg: rgba(245, 245, 245, 0.95);
+    --window-border: #ddd;
+    --window-shadow: rgba(0, 0, 0, 0.2);
+    --header-bg: #ccc;
+    --header-text: black;
+    --close-btn-bg: #e74c3c;
+    --close-btn-hover: #c0392b;
+    --window-content-bg: white;
+    --window-content-text: black;
+    --scrollbar-bg: #ddd;
+    --scrollbar-thumb: #bbb;
+    --scrollbar-thumb-hover: #999;
+}
+
+[data-theme="high-contrast"] {
+    --window-bg: black;
+    --window-border: yellow;
+    --window-shadow: rgba(255, 255, 0, 0.4);
+    --header-bg: black;
+    --header-text: yellow;
+    --close-btn-bg: yellow;
+    --close-btn-hover: white;
+    --window-content-bg: black;
+    --window-content-text: yellow;
+    --scrollbar-bg: black;
+    --scrollbar-thumb: yellow;
+    --scrollbar-thumb-hover: white;
 }

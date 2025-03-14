@@ -1,0 +1,175 @@
+/* 🎨 Theme Variables for User Customization */
+:root {
+    --player-bg: #111;
+    --player-border: #444;
+    --player-shadow: rgba(0, 0, 0, 0.5);
+    --player-text-color: white;
+    --player-font: 'Courier New', monospace;
+    --player-header-bg: #222;
+    --close-btn-bg: #ff4444;
+    --close-btn-hover: #cc0000;
+    --track-bg: #222;
+    --track-hover: #444;
+    --track-active: #666;
+}
+
+/* 🎵 Player Window */
+.player-window {
+    width: 420px;
+    height: 320px;
+    background: var(--player-bg);
+    border: 2px solid var(--player-border);
+    box-shadow: 4px 4px 8px var(--player-shadow);
+    color: var(--player-text-color);
+    font-family: var(--player-font);
+    position: absolute;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+/* 🎚️ Header (Title & Close Button) */
+.player-window .window-header {
+    background: var(--player-header-bg);
+    padding: 6px 12px;
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: grab;
+    border-bottom: 2px solid var(--player-border);
+}
+
+.player-window .window-header .close-btn {
+    background: var(--close-btn-bg);
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 4px;
+    transition: background 0.2s ease-in-out;
+}
+
+.player-window .window-header .close-btn:hover {
+    background: var(--close-btn-hover);
+}
+
+/* 🎵 Player Content */
+.player-content {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 🎶 Album Cover */
+.album-cover {
+    width: 130px;
+    height: 130px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0px 0px 12px rgba(255, 255, 255, 0.2);
+    transition: transform 0.2s ease-in-out;
+}
+
+.album-cover:hover {
+    transform: scale(1.05);
+}
+
+/* 🎼 Audio Player */
+#custom-audio-player {
+    width: 100%;
+    margin: 5px 0;
+    filter: invert(100%); /* Retro White Controls */
+    border-radius: 5px;
+}
+
+/* 📜 Tracklist */
+#tracklist {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0;
+    width: 100%;
+    max-height: 120px;
+    overflow-y: auto;
+    border-top: 2px solid var(--player-border);
+    padding-top: 5px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--track-hover) var(--player-bg);
+}
+
+.track-item {
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    background: var(--track-bg);
+    border-bottom: 1px solid var(--player-border);
+    transition: background 0.2s;
+    text-align: center;
+    border-radius: 5px;
+    margin: 2px 0;
+}
+
+.track-item:hover {
+    background: var(--track-hover);
+}
+
+.track-item:active {
+    background: var(--track-active);
+}
+
+/* ✅ Scrollbar Customization */
+#tracklist::-webkit-scrollbar {
+    width: 6px;
+}
+
+#tracklist::-webkit-scrollbar-track {
+    background: var(--player-bg);
+    border-radius: 4px;
+}
+
+#tracklist::-webkit-scrollbar-thumb {
+    background: var(--track-hover);
+    border-radius: 4px;
+}
+
+#tracklist::-webkit-scrollbar-thumb:hover {
+    background: var(--track-active);
+}
+
+/* 🎭 Responsive Design */
+@media (max-width: 500px) {
+    .player-window {
+        width: 90%;
+        height: auto;
+    }
+}
+
+/* 🎨 Theme Overrides for User Settings */
+[data-theme="light"] {
+    --player-bg: #f5f5f5;
+    --player-text-color: black;
+    --player-border: #ddd;
+    --player-shadow: rgba(0, 0, 0, 0.1);
+    --player-header-bg: #ccc;
+    --close-btn-bg: #e74c3c;
+    --close-btn-hover: #c0392b;
+    --track-bg: #e0e0e0;
+    --track-hover: #d5d5d5;
+    --track-active: #bbb;
+    --player-font: "Verdana", sans-serif;
+}
+
+[data-theme="high-contrast"] {
+    --player-bg: black;
+    --player-text-color: yellow;
+    --track-bg: black;
+    --track-hover: yellow;
+    --track-active: white;
+    --player-border: yellow;
+    --player-shadow: rgba(255, 255, 0, 0.3);
+    --player-header-bg: black;
+    --close-btn-bg: yellow;
+    --close-btn-hover: white;
+    --player-font: "Tahoma", sans-serif;
+}

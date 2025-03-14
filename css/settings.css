@@ -1,0 +1,84 @@
+/* ✅ settings.css - Styles for the Settings Window */
+
+:root {
+    --bg-color: #222; /* Default dark mode background */
+    --text-color: #fff; /* Default text color */
+    --input-bg: #333;
+    --input-border: #555;
+    --button-bg: #444;
+    --button-hover: #666;
+}
+
+/* 🎨 Light Mode Theme */
+[data-theme="light"] {
+    --bg-color: #f9f9f9;
+    --text-color: #111;
+    --input-bg: #fff;
+    --input-border: #ccc;
+    --button-bg: #ddd;
+    --button-hover: #bbb;
+}
+
+/* ✅ General Styles */
+#settings-window {
+    font-family: Arial, sans-serif;
+    background: var(--bg-color);
+    color: var(--text-color);
+    width: 500px;
+    height: auto;
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* ✅ Settings Header */
+#settings-window h2 {
+    font-size: 22px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* ✅ Input Fields */
+#settings-window label {
+    font-weight: bold;
+    display: block;
+    margin-top: 10px;
+}
+
+#settings-window select,
+#settings-window input[type="number"],
+#settings-window input[type="color"],
+#settings-window input[type="file"] {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid var(--input-border);
+    background: var(--input-bg);
+    color: var(--text-color);
+    border-radius: 4px;
+}
+
+/* ✅ Buttons */
+#settings-window button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 15px;
+    background: var(--button-bg);
+    border: none;
+    color: var(--text-color);
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+#settings-window button:hover {
+    background: var(--button-hover);
+}
+
+/* ✅ Responsive Styles */
+@media (max-width: 600px) {
+    #settings-window {
+        width: 90%;
+    }
+}

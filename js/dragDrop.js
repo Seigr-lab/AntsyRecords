@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     console.log("✅ Drag & Drop Initialized");
 
-    // Import Drag and Icon Managers
+    // Import Drag Manager & Ensure Icons are Draggable
     initializeDragManager();
-    initializeIconManager();
+    enableCatalogIconDrag(); // Ensure catalog items are draggable
 });

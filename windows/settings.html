@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <link rel="stylesheet" href="../css/windows.css">
+    <link rel="stylesheet" href="../css/settings.css">
+</head>
+<body>
+    <div id="settings-window" class="window-content">
+        <h2>Settings</h2>
+        <p>Customize your preferences below.</p>
+
+        <!-- 🌙 Theme Selection -->
+        <div class="setting-option">
+            <label for="theme-select">Choose Theme:</label>
+            <select id="theme-select">
+                <option value="default">Default (Dark)</option>
+                <option value="light">Light Mode</option>
+                <option value="high-contrast">High Contrast</option>
+            </select>
+        </div>
+
+        <!-- 🎨 Background Customization -->
+        <div class="setting-option">
+            <label for="background-type">Background:</label>
+            <select id="background-type">
+                <option value="default">Default</option>
+                <option value="color">Solid Color</option>
+                <option value="image">Custom Image</option>
+            </select>
+            <input type="color" id="background-color-picker" style="display: none;">
+            <input type="file" id="background-image-upload" accept="image/*" style="display: none;">
+        </div>
+
+        <!-- 🔠 Font Size -->
+        <div class="setting-option">
+            <label for="font-size">Font Size:</label>
+            <select id="font-size">
+                <option value="default">Default</option>
+                <option value="large">Large</option>
+                <option value="x-large">Extra Large</option>
+            </select>
+        </div>
+
+        <!-- 🖼️ Icon Size -->
+        <div class="setting-option">
+            <label for="icon-size">Icon Size:</label>
+            <input type="number" id="icon-size" min="40" max="200" step="10">
+        </div>
+
+        <!-- ✅ Save & Reset Buttons -->
+        <div class="settings-buttons">
+            <button id="save-settings">Save Changes</button>
+            <button id="reset-settings">Reset to Default</button>
+        </div>
+
+    </div>
+
+    <script src="../js/settings.js"></script>
+</body>
+</html>

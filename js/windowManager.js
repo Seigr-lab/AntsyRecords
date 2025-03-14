@@ -1,160 +1,141 @@
-document.addEventListener("DOMContentLoaded", () => {
-    console.log("✅ Window Manager Loaded");
+// ✅ windowManager.js - Centralized Window Controller
+console.log("✅ Window Manager Loaded");
 
-    function openWindow(file, title, albumId = null, albumTitle = null, artist = null) {
-        console.log(`📂 Opening window for: ${file}`);
+// ✅ Global tracking of open windows
+const openWindows = {};
 
-        let existingWindow = document.getElementById(`${file}-window`);
-        if (existingWindow) {
-            bringWindowToFront(existingWindow);
-            return;
-        }
+// ✅ Create a new window (Each window defines its own content via callback)
+function createWindow(id, title, width = 800, height = 600, contentLoader) {
+    console.log(`🖥 Opening Window: ${title}`);
 
-        switch (file) {
-            case "music-catalog":
-                openCatalogWindow();
-                return;
-            case "music-player":
-                if (albumId) {
-                    openPlayerWindow(albumId, albumTitle, artist);
-                } else {
-                    console.error("❌ No album ID provided for music player!");
-                }
-                return;
-            case "about":
-                openGenericWindow(file, title);
-                return;
-            default:
-                console.warn(`⚠️ No specific function for '${file}', using generic loader.`);
-                openGenericWindow(file, title);
-        }
+    // ✅ Prevent duplicate windows
+    if (openWindows[id]) {
+        bringWindowToFront(openWindows[id]);
+        return;
     }
 
-    function openGenericWindow(file, title) {
-        let win = document.createElement("div");
-        win.id = `${file}-window`;
-        win.classList.add("window");
+    // ✅ Create the window container
+    let win = document.createElement("div");
+    win.id = id;
+    win.classList.add("window");
+    win.style.position = "absolute";
+    win.style.left = `${Math.min(100 + Math.random() * 300, window.innerWidth - width)}px`;
+    win.style.top = `${Math.min(100 + Math.random() * 200, window.innerHeight - height)}px`;
+    win.style.width = `${width}px`;
+    win.style.height = `${height}px`;
+    win.style.zIndex = "100";
 
-        win.style.position = "absolute";
-        win.style.left = `${Math.min(100 + Math.random() * 300, window.innerWidth - 320)}px`;
-        win.style.top = `${Math.min(100 + Math.random() * 200, window.innerHeight - 250)}px`;
-        win.style.zIndex = "100";
+    // ✅ Base window structure (content is injected dynamically)
+    win.innerHTML = `
+        <div class="window-header">
+            <span>${title}</span>
+            <button class="close-btn">✖</button>
+        </div>
+        <div class="window-content"></div>
+    `;
 
-        win.innerHTML = `
-            <div class="window-header">
-                <span>${title}</span>
-                <button class="close-btn">✖</button>
-            </div>
-            <div class="window-content" id="${file}-content">
-                <p style="color: red;">Loading...</p>
-            </div>
-        `;
+    // ✅ Append window to main container
+    document.getElementById("window-container").appendChild(win);
+    openWindows[id] = win;
 
-        document.getElementById("window-container").appendChild(win);
+    // ✅ Enable dragging and resizing
+    makeDraggable(win);
+    makeResizable(win);
+
+    // ✅ Close button event
+    win.querySelector(".close-btn").addEventListener("click", () => {
+        win.remove();
+        delete openWindows[id];
+    });
+
+    bringWindowToFront(win);
+
+    // ✅ Inject content using the provided function (defined in individual window scripts)
+    if (typeof contentLoader === "function") {
+        contentLoader(win.querySelector(".window-content"));
+    } else {
+        console.error(`❌ No valid contentLoader function for ${id}`);
+    }
+}
+
+// ✅ Bring window to the front
+function bringWindowToFront(win) {
+    win.style.zIndex = "200";
+}
+
+// ✅ Make a window draggable
+function makeDraggable(win) {
+    let header = win.querySelector(".window-header");
+    let shiftX, shiftY;
+    let isDragging = false;
+
+    function onMove(event) {
+        let clientX = event.touches ? event.touches[0].clientX : event.clientX;
+        let clientY = event.touches ? event.touches[0].clientY : event.clientY;
+        win.style.left = `${Math.max(0, Math.min(clientX - shiftX, window.innerWidth - win.offsetWidth))}px`;
+        win.style.top = `${Math.max(0, Math.min(clientY - shiftY, window.innerHeight - win.offsetHeight))}px`;
+    }
+
+    function startDrag(event) {
+        event.preventDefault();
+        isDragging = true;
+        let clientX = event.touches ? event.touches[0].clientX : event.clientX;
+        let clientY = event.touches ? event.touches[0].clientY : event.clientY;
+        shiftX = clientX - win.getBoundingClientRect().left;
+        shiftY = clientY - win.getBoundingClientRect().top;
         bringWindowToFront(win);
-        makeDraggable(win);
-        makeResizable(win);
 
-        win.querySelector(".close-btn").addEventListener("click", () => closeWindow(file));
-
-        fetch(`windows/${file}.html`)
-            .then(response => response.ok ? response.text() : Promise.reject())
-            .then(html => document.getElementById(`${file}-content`).innerHTML = html)
-            .catch(() => {
-                document.getElementById(`${file}-content`).innerHTML = `<p style="color:red;">Failed to load content.</p>`;
-            });
+        document.addEventListener(event.type === "mousedown" ? "mousemove" : "touchmove", onMove);
+        document.addEventListener(event.type === "mousedown" ? "mouseup" : "touchend", () => {
+            isDragging = false;
+            document.removeEventListener(event.type === "mousedown" ? "mousemove" : "touchmove", onMove);
+        }, { once: true });
     }
 
-    function openPlayerWindow(albumId, title, artist) {
-        console.log(`🎵 Opening player window for: ${title} by ${artist}`);
+    header.addEventListener("mousedown", startDrag);
+    header.addEventListener("touchstart", startDrag, { passive: true });
+    header.style.cursor = "grab";
+}
 
-        let existingWindow = document.getElementById(`player-${albumId}-window`);
-        if (existingWindow) {
-            bringWindowToFront(existingWindow);
-            return;
-        }
+// ✅ Make window resizable
+function makeResizable(win) {
+    win.style.resize = "both";
+    win.style.overflow = "auto";
+}
 
-        let win = document.createElement("div");
-        win.id = `player-${albumId}-window`;
-        win.classList.add("window", "player-window");
+// ✅ Define global functions to open specific windows (Each loads its own content)
+window.openCatalogWindow = function () {
+    createWindow("catalog-window", "Music Catalog", 800, 600, loadCatalogContent);
+};
 
-        win.style.position = "absolute";
-        win.style.left = `${Math.min(100 + Math.random() * 300, window.innerWidth - 320)}px`;
-        win.style.top = `${Math.min(100 + Math.random() * 200, window.innerHeight - 250)}px`;
-        win.style.zIndex = "100";
+window.openAboutWindow = function () {
+    createWindow("about-window", "About Antsy Records", 600, 500, loadAboutContent);
+};
 
-        win.innerHTML = `
-            <div class="window-header">
-                <span>Now Playing: ${title}</span>
-                <button class="close-btn">✖</button>
-            </div>
-            <div class="window-content">
-                <iframe style="width:100%; height:150px; border:none;"
-                    src="https://bandcamp.com/EmbeddedPlayer/album=${albumId}/size=large/bgcol=333333/linkcol=ffffff/minimal=true/transparent=true/"></iframe>
-            </div>
-        `;
+window.openSettingsWindow = function () {
+    createWindow("settings-window", "Settings", 600, 500, loadSettingsContent);
+};
 
-        document.getElementById("window-container").appendChild(win);
-        bringWindowToFront(win);
-        makeDraggable(win);
-        makeResizable(win);
+// ✅ Content loading functions (loaded dynamically in respective scripts)
+function loadCatalogContent(contentDiv) {
+    contentDiv.innerHTML = `<p style="color: white;">Loading catalog...</p>`;
+    import("./catalogWindow.js").then(module => module.loadCatalogContent(contentDiv));
+}
 
-        win.querySelector(".close-btn").addEventListener("click", () => {
-            win.remove();
-        });
-    }
+function loadAboutContent(contentDiv) {
+    contentDiv.innerHTML = `<p style="color: white;">Loading about page...</p>`;
+    fetch("windows/about.html")
+        .then(response => response.text())
+        .then(html => contentDiv.innerHTML = html)
+        .catch(() => contentDiv.innerHTML = `<p style="color:red;">Failed to load about page.</p>`);
+}
 
-    function closeWindow(file) {
-        let windowElement = document.getElementById(`${file}-window`);
-        if (windowElement) {
-            windowElement.remove();
-        }
-    }
+function loadSettingsContent(contentDiv) {
+    contentDiv.innerHTML = `<p style="color: white;">Loading settings...</p>`;
+    import("./settingsWindow.js").then(module => module.loadSettingsContent(contentDiv));
+}
 
-    function bringWindowToFront(win) {
-        document.querySelectorAll(".window").forEach(w => w.style.zIndex = "10");
-        win.style.zIndex = "200";
-    }
-
-    function makeDraggable(win) {
-        let header = win.querySelector(".window-header");
-        let shiftX, shiftY;
-        let isDragging = false;
-
-        function onMove(event) {
-            let clientX = event.touches ? event.touches[0].clientX : event.clientX;
-            let clientY = event.touches ? event.touches[0].clientY : event.clientY;
-            win.style.left = `${Math.max(0, Math.min(clientX - shiftX, window.innerWidth - win.offsetWidth))}px`;
-            win.style.top = `${Math.max(0, Math.min(clientY - shiftY, window.innerHeight - win.offsetHeight))}px`;
-        }
-
-        function startDrag(event) {
-            event.preventDefault();
-            isDragging = true;
-            let clientX = event.touches ? event.touches[0].clientX : event.clientX;
-            let clientY = event.touches ? event.touches[0].clientY : event.clientY;
-            shiftX = clientX - win.getBoundingClientRect().left;
-            shiftY = clientY - win.getBoundingClientRect().top;
-            bringWindowToFront(win);
-
-            document.addEventListener(event.type === "mousedown" ? "mousemove" : "touchmove", onMove);
-            document.addEventListener(event.type === "mousedown" ? "mouseup" : "touchend", () => {
-                isDragging = false;
-                document.removeEventListener(event.type === "mousedown" ? "mousemove" : "touchmove", onMove);
-            }, { once: true });
-        }
-
-        header.addEventListener("mousedown", startDrag);
-        header.addEventListener("touchstart", startDrag, { passive: true });
-        header.style.cursor = "grab";
-    }
-
-    function makeResizable(win) {
-        win.style.resize = "both";
-        win.style.overflow = "auto";
-    }
-
-    window.openWindow = openWindow;
-    window.closeWindow = closeWindow;
-    window.openPlayerWindow = openPlayerWindow;
-});
+// ✅ Ensure `initializeWindows` exists globally (fallback mechanism)
+window.initializeWindows = function () {
+    console.log("✅ Initializing Windows...");
+};

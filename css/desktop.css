@@ -1,12 +1,22 @@
+/* 🌟 Theme Variables for Customizable Desktop */
+:root {
+    --desktop-bg: url("../media/background.png");
+    --desktop-bg-color: #222; /* Fallback color if no image is used */
+    --desktop-icon-color: white;
+    --desktop-icon-size: 80px;
+}
+
+/* 🌄 Desktop Background */
 #desktop-container {
     width: 100vw;
     height: 100vh;
     position: relative;
-    overflow: hidden; /* Prevents anything from being placed outside */
-    background-size: cover;
+    overflow: hidden; /* Prevents overflow issues */
+    background: var(--desktop-bg-color) var(--desktop-bg) center/cover no-repeat fixed;
+    transition: background 0.5s ease-in-out;
 }
 
-
+/* 🖥️ Desktop Icons */
 #desktop {
     position: absolute;
     width: 100%;
@@ -19,17 +29,62 @@
     overflow: hidden; /* Ensures icons never exceed screen size */
 }
 
+/* 📌 Icon Styles */
 .icon {
     position: absolute;
-    width: 80px;
-    height: 80px;
+    width: var(--desktop-icon-size);
+    height: var(--desktop-icon-size);
     cursor: pointer;
     text-align: center;
-    color: white;
-    z-index: 50; /* Prevents overlapping windows */
+    color: var(--desktop-icon-color);
+    z-index: 50; /* Ensures icons stay on top */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 12px;
+    font-weight: bold;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+    transition: transform 0.2s ease-in-out;
 }
 
+.icon:hover {
+    transform: scale(1.1);
+}
+
+/* 🖼️ Icon Images */
 .icon img {
-    width: 80px;
-    height: 80px;
+    width: var(--desktop-icon-size);
+    height: var(--desktop-icon-size);
+    object-fit: contain;
+    transition: transform 0.2s ease-in-out;
+}
+
+/* 🏗️ Scrollbar Customization */
+#desktop-container::-webkit-scrollbar {
+    width: 10px;
+}
+
+#desktop-container::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 5px;
+}
+
+#desktop-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 5px;
+}
+
+#desktop-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* 🎨 Theme Overrides for User Settings */
+[data-theme="light"] {
+    --desktop-bg-color: #f0f0f0;
+    --desktop-icon-color: black;
+}
+
+[data-theme="high-contrast"] {
+    --desktop-bg-color: black;
+    --desktop-icon-color: yellow;
 }
